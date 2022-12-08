@@ -5,11 +5,11 @@ import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
-  declarations: [],
+  declarations: [LoginComponent],
   imports: [
     CommonModule,
     FormsModule
   ],
-  exports:[]
+  exports:[LoginComponent]
 })
 export class LoginModule { }
