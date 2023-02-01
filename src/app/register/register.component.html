@@ -1,18 +1,26 @@
 <h4 class="text-center">Registre-se e comece anunciar</h4>
-
-<form action="form mt-4">
+<form class="form mt-4" [formGroup]="registerForm" (submit)="register()">
   <div class="form-group">
-      <input placeholder="e-mail" class="form-control"/>
+    <input placeholder="Nome Completo" class="form-control" formControlName= "nome"/>
   </div>
   <div class="form-group">
-    <input placeholder="Nome Completo" class="form-control"/>
+    <input placeholder="e-mail" class="form-control" formControlName= "email"/>
+</div>
+  <div class="form-group">
+    <input placeholder="Usuario" class="form-control" formControlName= "usuario"/>
   </div>
   <div class="form-group">
-    <input placeholder="Usuario" class="form-control"/>
+    <input placeholder="Telefone" class="form-control" formControlName= "telefone"/>
   </div>
   <div class="form-group">
-    <input type="password" placeholder="Senha" class="form-control"/>
+    <input placeholder="Data de nascimento" class="form-control" formControlName= "dataNasc"/>
   </div>
-
+  <div class="form-group">
+    <input placeholder="Documento" class="form-control" formControlName= "documento"/>
+  </div>
+  <div class="form-group">
+    <input type="password" placeholder="Senha" class="form-control" formControlName= "senha"/>
+  </div>
   <button class="btn btn-primary btn-block">Cadastro</button>
+  <p>Já é um usuário ? <a [routerLink]="['/login']">Faça Login</a></p>
 </form>

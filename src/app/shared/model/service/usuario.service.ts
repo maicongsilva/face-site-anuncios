@@ -1,0 +1,44 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { NovoUsuario } from '../../../register/novo-usuario';
+import { throwError } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class NovoUsuarioService {
+
+  apiUrl = 'http://localhost:8080/api/user'
+
+  httpOptions = {
+    headers: new HttpHeaders()
+  };
+
+  constructor(private http:HttpClient) { }
+
+  cadastraNovoUsuario(novoUsuario: NovoUsuario){
+    this.http.post(this.apiUrl, novoUsuario, this.httpOptions).subscribe((response) => {
+      console.log(response);
+    });
+  }
+
+  login(nome:string, senha:string){
+    console.log(this.apiUrl + nome);
+    this.http.get(this.apiUrl + nome);
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    if (error.status === 0) {
+      // A client-side or network error occurred. Handle it accordingly.
+      console.error('An error occurred:', error.error);
+    } else {
+      // The backend returned an unsuccessful response code.
+      // The response body may contain clues as to what went wrong.
+      console.error(
+        `Backend returned code ${error.status}, body was: `, error.error);
+    }
+    // Return an observable with a user-facing error message.
+    return throwError(() => new Error('Something bad happened; please try again later.'));
+  }
+}
+

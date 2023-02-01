@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { NovoUsuarioService } from '../shared/model/service/usuario.service';
 
 @Component({
   selector: 'app-login',
@@ -12,13 +14,14 @@ export class LoginComponent implements OnInit {
   message: string = "";
 
 
-  constructor() { }
+  constructor(private novoUsuarioService:NovoUsuarioService) { }
 
   ngOnInit() {
   }
-  trylogin(uname: string, pass: string)
-  {
-    console.log(uname+" "+pass)
+
+  trylogin(uname: string, pass: string){
+    console.log(uname);
+    console.log(this.novoUsuarioService.login(uname,pass));
     if(uname === this.username && pass === this.password) {
       this.message = "Login Successfull"
     }else {
