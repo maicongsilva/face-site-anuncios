@@ -21,10 +21,9 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 
 export class RegisterComponent implements OnInit {
 
-  emailFormControl = new FormControl('', [Validators.required, Validators.email]);
+  email = new FormControl('', [Validators.required, Validators.email]);
   matcher = new MyErrorStateMatcher();
   hide = true;
-  registerForm!: FormGroup;
   successmessage=null;
   errormessage=null;
   message: string = "";
@@ -35,22 +34,26 @@ export class RegisterComponent implements OnInit {
     ) { }
 
   ngOnInit() {
-    this.registerForm = this.formbuilder.group({
-      nome:[''],
-      email:['',[Validators.required]],
-      usuario:[''],
-      telefone:[''],
-      dataNasc:[''],
-      documento:[''],
-      senha:['',[Validators.required]],
-    })
   }
 
-  register(){
-    const novoUsuario = this.registerForm.getRawValue() as NovoUsuario;
-    this.novoUsuarioService.cadastraNovoUsuario(novoUsuario);
-    console.log("Registered successfully");
-    this.message="Registered successfully "
+  registerForm = new FormGroup({
+    nome: new FormControl('', Validators.required),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    senha: new FormControl('', Validators.required)
+  });
+
+  onSubmit() {
+    const formData = this.registerForm.value;
+    console.log(formData);
+    this.novoUsuarioService.cadastraNovoUsuario(formData);
   }
+  
+  //register(){
+  //  console.log(this.registerForm);
+  //  const novoUsuario = this.registerForm.getRawValue() as NovoUsuario;
+  //  this.novoUsuarioService.cadastraNovoUsuario(novoUsuario);
+  //  console.log("Registered successfully");
+  //  this.message="Registered successfully "
+  //}
 
 }

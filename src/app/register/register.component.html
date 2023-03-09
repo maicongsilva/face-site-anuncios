@@ -1,27 +1,27 @@
 <div class="card">
   <div class="registro-div">
-    <form class="registro-form">
+    <form class="registro-form" [formGroup]="registerForm" (submit)="onSubmit()">
       <mat-form-field class="nome">
         <mat-label>Nome</mat-label>
-        <input matInput placeholder="Ex. nome" value="nome">
+        <input matInput placeholder="Ex. nome" formControlName="nome">
       </mat-form-field>
 
       <mat-form-field class="e-mail">
         <mat-label>Email</mat-label>
-        <input type="email" matInput [formControl]="emailFormControl" [errorStateMatcher]="matcher"
-              placeholder="Ex. pat@example.com">
+        <input type="email" matInput formControlName="email" [errorStateMatcher]="matcher"
+              placeholder="Ex. pat@exemplo.com">
         <mat-hint>Errors appear instantly!</mat-hint>
-        <mat-error *ngIf="emailFormControl.hasError('email') && !emailFormControl.hasError('required')">
+        <mat-error *ngIf="email.hasError('email') && !email.hasError('required')">
           Please enter a valid email address
         </mat-error>
-        <mat-error *ngIf="emailFormControl.hasError('required')">
+        <mat-error *ngIf="email.hasError('required')">
           Email is <strong>required</strong>
         </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="fill">
         <mat-label>password</mat-label>
-        <input matInput [type]="hide ? 'password' : 'text'">
+        <input matInput [type]="hide ? 'password' : 'text'" formControlName="senha">
         <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
           <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
         </button>

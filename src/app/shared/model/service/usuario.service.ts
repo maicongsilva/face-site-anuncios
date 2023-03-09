@@ -16,7 +16,7 @@ export class NovoUsuarioService {
 
   constructor(private http:HttpClient) { }
 
-  cadastraNovoUsuario(novoUsuario: NovoUsuario){
+  cadastraNovoUsuario(novoUsuario: any){
     this.http.post(this.apiUrl, novoUsuario, this.httpOptions).subscribe((response) => {
       console.log(response);
     });
