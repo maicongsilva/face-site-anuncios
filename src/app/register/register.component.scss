@@ -1,6 +1,38 @@
-//.form{
-//  display: flex;
-//  justify-content: space-between;
-//  align-items: center;
-//
-//}
+.registro-div{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    justify-content: center;
+    width: 466px;
+    align-items: center;
+    height: 466px;
+    padding: 32px 56px 24px 56px;
+    border-radius: 4px 4px 0px 0px;
+    color: rgb(74, 74, 74);
+    margin-top: -1px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgb(153 153 153 / 20%) 0px 2px 4px 0px;
+    box-sizing: border-box;
+    font-family: "Nunito Sans", "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
+  
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .card{
+    display: flex;
+    justify-content: center;
+  }
+
+  .mat-form-field-infix {
+        width: 244px;
+  }
+
+  .button-salvar {
+    display: table-cell;
+    max-width: 600px;
+  }
+
+  .mat-button {
+    width: 244px;
+  }

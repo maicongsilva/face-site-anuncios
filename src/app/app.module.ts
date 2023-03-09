@@ -13,6 +13,10 @@ import { HomeModule } from './home/home.module';
 import { HttpClientModule } from '@angular/common/http'
 import { LoginModule } from './login/login.module';
 import { PesquisaModule } from './pesquisa/pesquisa.module';
+import {MatInputModule} from '@angular/material/input';
+import {MatIconModule} from '@angular/material/icon';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
+
 
 @NgModule({
     declarations: [
@@ -33,7 +37,10 @@ import { PesquisaModule } from './pesquisa/pesquisa.module';
         MatButtonModule,
         HttpClientModule,
         LoginModule,
-        PesquisaModule
+        PesquisaModule,
+        MatInputModule,
+        MatIconModule,
+        MatButtonToggleModule
       ]
 })
 export class AppModule { }
