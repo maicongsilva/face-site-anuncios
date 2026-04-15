@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, of, switchMap } from 'rxjs';
 import { AuthService } from '../shared/model/service/auth.service';
 import { AuthUser } from '../shared/model/auth.model';
 import { Anuncio } from '../shared/model/anuncio.model';
@@ -18,6 +18,8 @@ export class ProfileComponent implements OnInit {
   feedback = '';
   editingId: number | null = null;
   previewImage: string | null = null;
+  selectedImageFile: File | null = null;
+  currentImageUrl: string | null = null;
 
   anuncioForm = this.fb.group({
     titulo: this.fb.control('', { nonNullable: true, validators: [Validators.required, Validators.minLength(3)] }),
@@ -56,14 +58,22 @@ export class ProfileComponent implements OnInit {
       categoria: formValue.categoria,
       localizacao: formValue.localizacao,
       preco: Number(formValue.preco ?? 0),
-      imagemUrl: this.previewImage || undefined
+      imagemUrl: this.toRelativeImageUrl(this.currentImageUrl) || undefined
     };
 
     const request$ = this.editingId
       ? this.anuncioService.atualizar(this.editingId, payload)
       : this.anuncioService.criar(payload);
 
-    request$.subscribe({
+    request$.pipe(
+      switchMap((anuncio) => {
+        if (this.selectedImageFile && anuncio.id) {
+          return this.anuncioService.uploadImagem(anuncio.id, this.selectedImageFile);
+        }
+
+        return of(anuncio);
+      })
+    ).subscribe({
       next: (anuncio) => {
         if (this.editingId) {
           this.meusAnuncios = this.meusAnuncios.map(item => item.id === anuncio.id ? anuncio : item);
@@ -85,7 +95,9 @@ export class ProfileComponent implements OnInit {
 
   editarAnuncio(anuncio: Anuncio): void {
     this.editingId = anuncio.id || null;
+    this.currentImageUrl = anuncio.imagemUrl || null;
     this.previewImage = anuncio.imagemUrl || null;
+    this.selectedImageFile = null;
     this.anuncioForm.patchValue({
       titulo: anuncio.titulo,
       descricao: anuncio.descricao,
@@ -123,6 +135,8 @@ export class ProfileComponent implements OnInit {
       return;
     }
 
+    this.selectedImageFile = file;
+
     const reader = new FileReader();
     reader.onload = () => {
       this.previewImage = typeof reader.result === 'string' ? reader.result : null;
@@ -138,6 +152,8 @@ export class ProfileComponent implements OnInit {
   private resetFormulario(): void {
     this.editingId = null;
     this.previewImage = null;
+    this.selectedImageFile = null;
+    this.currentImageUrl = null;
     this.anuncioForm.reset({
       titulo: '',
       descricao: '',
@@ -145,6 +161,14 @@ export class ProfileComponent implements OnInit {
       localizacao: '',
       preco: null
     });
+  }
+
+  private toRelativeImageUrl(url: string | null): string | undefined {
+    if (!url) {
+      return undefined;
+    }
+
+    return url.replace(/^https?:\/\/[^/]+/, '');
   }
 
   private carregarMeusAnuncios(): void {
