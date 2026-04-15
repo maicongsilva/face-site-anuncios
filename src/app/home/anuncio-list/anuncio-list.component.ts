@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Anuncio } from 'src/app/shared/model/anuncio.model';
 import { AnuncioService } from 'src/app/shared/model/service/anuncio.service';
+import { AuthService } from 'src/app/shared/model/service/auth.service';
 
 @Component({
   selector: 'app-anuncio-list',
@@ -10,8 +12,13 @@ import { AnuncioService } from 'src/app/shared/model/service/anuncio.service';
 export class AnuncioListComponent implements OnInit {
   cards: Array<Anuncio & { image: string }> = [];
   loading = true;
+  feedback = '';
 
-  constructor(private anuncioService: AnuncioService) { }
+  constructor(
+    private anuncioService: AnuncioService,
+    private authService: AuthService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.anuncioService.listarPublicos().subscribe({
@@ -24,6 +31,28 @@ export class AnuncioListComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
+      }
+    });
+  }
+
+  toggleFavorito(card: Anuncio & { image: string }): void {
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    if (!card.id) {
+      return;
+    }
+
+    this.anuncioService.toggleFavorito(card.id).subscribe({
+      next: (updated) => {
+        this.cards = this.cards.map((item) => item.id === updated.id
+          ? { ...updated, image: updated.imagemUrl || this.getImageByCategory(updated.categoria) }
+          : item);
+      },
+      error: () => {
+        this.feedback = 'Não foi possível atualizar os favoritos agora.';
       }
     });
   }

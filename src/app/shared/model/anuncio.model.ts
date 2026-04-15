@@ -6,6 +6,8 @@ export interface Anuncio {
   localizacao: string;
   preco: number;
   imagemUrl?: string;
+  favoritado?: boolean;
+  totalFavoritos?: number;
   dataCriacao?: string;
   anuncianteId?: number;
   anuncianteNome?: string;

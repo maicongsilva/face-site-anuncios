@@ -25,6 +25,16 @@
             <strong>Anunciante</strong>
             <span>{{ item.anuncianteNome || 'Não informado' }}</span>
           </div>
+          <div>
+            <strong>Favoritos</strong>
+            <span>❤️ {{ item.totalFavoritos || 0 }}</span>
+          </div>
+        </div>
+
+        <div class="detail-actions">
+          <button mat-raised-button color="primary" type="button" (click)="toggleFavorito()">
+            {{ item.favoritado ? 'Desfavoritar' : 'Favoritar' }}
+          </button>
         </div>
       </mat-card-content>
     </mat-card>

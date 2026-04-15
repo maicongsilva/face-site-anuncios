@@ -8,6 +8,10 @@
     Carregando anúncios...
   </div>
 
+  <div class="status-box" *ngIf="feedback && !loading">
+    {{ feedback }}
+  </div>
+
   <div class="card-grid" *ngIf="!loading && cards.length">
     <mat-card class="showcase-card" *ngFor="let card of cards">
       <img mat-card-image [src]="card.image" [alt]="card.titulo">
@@ -22,9 +26,13 @@
         </div>
 
         <small>Anunciante: {{ card.anuncianteNome }}</small>
+        <small class="favorite-count">❤️ {{ card.totalFavoritos || 0 }} favorito(s)</small>
       </mat-card-content>
       <mat-card-actions>
         <a mat-button color="primary" [routerLink]="['/anuncios', card.id]">Detalhes</a>
+        <button mat-button color="accent" type="button" (click)="toggleFavorito(card)">
+          {{ card.favoritado ? 'Desfavoritar' : 'Favoritar' }}
+        </button>
       </mat-card-actions>
     </mat-card>
   </div>

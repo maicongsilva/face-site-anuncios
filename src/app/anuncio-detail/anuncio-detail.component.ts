@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Anuncio } from '../shared/model/anuncio.model';
 import { AnuncioService } from '../shared/model/service/anuncio.service';
+import { AuthService } from '../shared/model/service/auth.service';
 
 @Component({
   selector: 'app-anuncio-detail',
@@ -14,7 +15,9 @@ export class AnuncioDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private anuncioService: AnuncioService
+    private anuncioService: AnuncioService,
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -33,6 +36,21 @@ export class AnuncioDetailComponent implements OnInit {
       error: () => {
         this.loading = false;
       }
+    });
+  }
+
+  toggleFavorito(): void {
+    if (!this.anuncio?.id) {
+      return;
+    }
+
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.anuncioService.toggleFavorito(this.anuncio.id).subscribe({
+      next: (anuncio) => this.anuncio = anuncio
     });
   }
 }

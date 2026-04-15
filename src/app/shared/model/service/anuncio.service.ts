@@ -20,12 +20,20 @@ export class AnuncioService {
     return this.http.get<Anuncio[]>(`${this.apiUrl}/meus`);
   }
 
+  listarFavoritos(): Observable<Anuncio[]> {
+    return this.http.get<Anuncio[]>(`${this.apiUrl}/favoritos/meus`);
+  }
+
   buscarPorId(id: number): Observable<Anuncio> {
     return this.http.get<Anuncio>(`${this.apiUrl}/${id}`);
   }
 
   criar(payload: Partial<Anuncio>): Observable<Anuncio> {
     return this.http.post<Anuncio>(this.apiUrl, payload);
+  }
+
+  toggleFavorito(id: number): Observable<Anuncio> {
+    return this.http.post<Anuncio>(`${this.apiUrl}/${id}/favorito`, {});
   }
 
   atualizar(id: number, payload: Partial<Anuncio>): Observable<Anuncio> {
