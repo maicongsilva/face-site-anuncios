@@ -5,42 +5,54 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { RegisterComponent } from './register/register.component';
-import { RoutingModule } from './routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatToolbarModule} from '@angular/material/toolbar';
-import { MatButtonModule} from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
 import { HomeModule } from './home/home.module';
-import { HttpClientModule } from '@angular/common/http'
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { LoginModule } from './login/login.module';
 import { PesquisaModule } from './pesquisa/pesquisa.module';
-import {MatInputModule} from '@angular/material/input';
-import {MatIconModule} from '@angular/material/icon';
-import {MatButtonToggleModule} from '@angular/material/button-toggle';
-
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatCardModule } from '@angular/material/card';
+import { ProfileComponent } from './profile/profile.component';
+import { AnuncioDetailComponent } from './anuncio-detail/anuncio-detail.component';
+import { AuthInterceptor } from './shared/interceptors/auth.interceptor';
 
 @NgModule({
-    declarations: [
-        AppComponent,
-        RegisterComponent
-    ],
-    providers: [],
-    bootstrap: [AppComponent],
-    imports: [
-        BrowserModule,
-        AppRoutingModule,
-        RoutingModule,
-        ReactiveFormsModule,
-        BrowserAnimationsModule,
-        MatSlideToggleModule,
-        HomeModule,
-        MatToolbarModule,
-        MatButtonModule,
-        HttpClientModule,
-        LoginModule,
-        PesquisaModule,
-        MatInputModule,
-        MatIconModule,
-        MatButtonToggleModule
-      ]
+  declarations: [
+    AppComponent,
+    RegisterComponent,
+    ProfileComponent,
+    AnuncioDetailComponent
+  ],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ],
+  bootstrap: [AppComponent],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    ReactiveFormsModule,
+    BrowserAnimationsModule,
+    MatSlideToggleModule,
+    HomeModule,
+    MatToolbarModule,
+    MatButtonModule,
+    HttpClientModule,
+    LoginModule,
+    PesquisaModule,
+    MatInputModule,
+    MatIconModule,
+    MatButtonToggleModule,
+    MatFormFieldModule,
+    MatCardModule
+  ]
 })
 export class AppModule { }

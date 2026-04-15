@@ -1,23 +1,35 @@
-<div class="cardi-list">
-    <div class="card">
-      <mat-card class="example-card">
-        <mat-card-header>
-          <div mat-card-avatar class="example-header-image"></div>
-          <mat-card-title>Shiba Inu</mat-card-title>
-          <mat-card-subtitle>Dog Breed</mat-card-subtitle>
-        </mat-card-header>
-        <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu">
-        <mat-card-content>
-          <p>
-            The Shiba Inu is the smallest of the six original and distinct spitz breeds of dog from Japan.
-            A small, agile dog that copes very well with mountainous terrain, the Shiba Inu was originally
-            bred for hunting.
-          </p>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-button>LIKE</button>
-          <button mat-button>SHARE</button>
-        </mat-card-actions>
-      </mat-card>
-    </div>
-</div>
+<section class="showcase-section">
+  <div class="section-header">
+    <h2>Anúncios em destaque</h2>
+    <p>Agora a vitrine está ligada ao backend real da aplicação.</p>
+  </div>
+
+  <div class="status-box" *ngIf="loading">
+    Carregando anúncios...
+  </div>
+
+  <div class="card-grid" *ngIf="!loading && cards.length">
+    <mat-card class="showcase-card" *ngFor="let card of cards">
+      <img mat-card-image [src]="card.image" [alt]="card.titulo">
+      <mat-card-content>
+        <span class="tag">{{ card.categoria }}</span>
+        <h3>{{ card.titulo }}</h3>
+        <p>{{ card.descricao }}</p>
+
+        <div class="meta-line">
+          <strong>{{ card.preco | currency:'BRL':'symbol':'1.2-2' }}</strong>
+          <span>{{ card.localizacao }}</span>
+        </div>
+
+        <small>Anunciante: {{ card.anuncianteNome }}</small>
+      </mat-card-content>
+      <mat-card-actions>
+        <a mat-button color="primary" [routerLink]="['/anuncios', card.id]">Detalhes</a>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <div class="status-box" *ngIf="!loading && !cards.length">
+    Nenhum anúncio disponível no momento.
+  </div>
+</section>

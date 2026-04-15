@@ -1,43 +1,39 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { NovoUsuario } from '../../../register/novo-usuario';
-import { throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NovoUsuarioService {
 
-  apiUrl = 'http://localhost:8080/api/user'
+  apiUrl = `${environment.apiUrl}/user`;
 
   httpOptions = {
     headers: new HttpHeaders()
   };
 
-  constructor(private http:HttpClient) { }
+  constructor(private http: HttpClient) { }
 
-  cadastraNovoUsuario(novoUsuario: any){
-    this.http.post(this.apiUrl, novoUsuario, this.httpOptions).subscribe((response) => {
-      console.log(response);
-    });
+  cadastraNovoUsuario(novoUsuario: NovoUsuario): Observable<unknown> {
+    return this.http.post(this.apiUrl, novoUsuario, this.httpOptions)
+      .pipe(catchError((error) => this.handleError(error)));
   }
 
-  login(nome:string, senha:string){
-    console.log(this.apiUrl + nome);
-    this.http.get(this.apiUrl + nome);
+  findByDocumento(documento: string): Observable<unknown> {
+    return this.http.get(`${this.apiUrl}/${documento}`, this.httpOptions)
+      .pipe(catchError((error) => this.handleError(error)));
   }
 
   private handleError(error: HttpErrorResponse) {
     if (error.status === 0) {
-      // A client-side or network error occurred. Handle it accordingly.
       console.error('An error occurred:', error.error);
     } else {
-      // The backend returned an unsuccessful response code.
-      // The response body may contain clues as to what went wrong.
-      console.error(
-        `Backend returned code ${error.status}, body was: `, error.error);
+      console.error(`Backend returned code ${error.status}, body was: `, error.error);
     }
-    // Return an observable with a user-facing error message.
     return throwError(() => new Error('Something bad happened; please try again later.'));
   }
 }

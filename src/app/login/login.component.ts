@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { NovoUsuarioService } from '../shared/model/service/usuario.service';
+import { Router } from '@angular/router';
+import { AuthService } from '../shared/model/service/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -8,25 +8,31 @@ import { NovoUsuarioService } from '../shared/model/service/usuario.service';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-  username ='admin';
-  password = 'admin';
-  LoginComponent: any;
-  message: string = "";
+  message = '';
+  loading = false;
 
+  constructor(private authService: AuthService, private router: Router) { }
 
-  constructor(private novoUsuarioService:NovoUsuarioService) { }
-
-  ngOnInit() {
-  }
-
-  trylogin(uname: string, pass: string){
-    console.log(uname);
-    console.log(this.novoUsuarioService.login(uname,pass));
-    if(uname === this.username && pass === this.password) {
-      this.message = "Login Successfull"
-    }else {
-      this.message = "Invalid Credentials"
+  ngOnInit(): void {
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/minha-conta']);
     }
   }
 
+  trylogin(email: string, senha: string): void {
+    this.message = '';
+    this.loading = true;
+
+    this.authService.login({ email, senha }).subscribe({
+      next: () => {
+        this.loading = false;
+        this.message = 'Login realizado com sucesso.';
+        this.router.navigate(['/minha-conta']);
+      },
+      error: (error) => {
+        this.loading = false;
+        this.message = error?.error?.message || error?.error || 'Credenciais inválidas.';
+      }
+    });
+  }
 }

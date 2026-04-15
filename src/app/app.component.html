@@ -1,11 +1,35 @@
-<mat-toolbar color="primary">
-  <mat-toolbar-row>
-    <span>Site Anuncios</span>
+<mat-toolbar color="primary" class="topbar">
+  <mat-toolbar-row class="toolbar-content">
+    <div class="brand-group" [routerLink]="['/']">
+      <span class="brand-mark">SA</span>
+      <div>
+        <span class="brand-link">Site Anuncios</span>
+        <small class="brand-subtitle">Autenticação segura e experiência moderna</small>
+      </div>
+    </div>
+
     <span class="example-spacer"></span>
-    <app-pesquisa></app-pesquisa>
-    <button mat-button color="write" [routerLink]="['login']">Entre</button>
+
+    <div class="toolbar-search">
+      <app-pesquisa></app-pesquisa>
+    </div>
+
+    <div class="toolbar-actions">
+      <ng-container *ngIf="!(authState$ | async); else loggedMenu">
+        <button mat-stroked-button class="action-btn secondary" [routerLink]="['/login']">Entrar</button>
+        <button mat-flat-button class="action-btn primary" [routerLink]="['/register']">Cadastre-se</button>
+      </ng-container>
+
+      <ng-template #loggedMenu>
+        <span class="user-name">Olá, {{ (currentUser$ | async)?.nome }}</span>
+        <button mat-stroked-button class="action-btn secondary" [routerLink]="['/minha-conta']">Minha conta</button>
+        <button mat-flat-button class="action-btn danger" (click)="logout()">Sair</button>
+      </ng-template>
+    </div>
   </mat-toolbar-row>
 </mat-toolbar>
 
-<router-outlet></router-outlet>
+<div class="page-shell">
+  <router-outlet></router-outlet>
+</div>
 

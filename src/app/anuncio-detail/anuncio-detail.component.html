@@ -1,0 +1,38 @@
+<section class="detail-page">
+  <div class="detail-shell" *ngIf="loading">
+    <div class="detail-box">Carregando anúncio...</div>
+  </div>
+
+  <div class="detail-shell" *ngIf="!loading && anuncio as item; else notFound">
+    <mat-card class="detail-card">
+      <img *ngIf="item.imagemUrl" [src]="item.imagemUrl" [alt]="item.titulo" class="detail-image">
+
+      <mat-card-content>
+        <span class="detail-tag">{{ item.categoria }}</span>
+        <h1>{{ item.titulo }}</h1>
+        <p class="detail-description">{{ item.descricao }}</p>
+
+        <div class="detail-grid">
+          <div>
+            <strong>Preço</strong>
+            <span>{{ item.preco | currency:'BRL':'symbol':'1.2-2' }}</span>
+          </div>
+          <div>
+            <strong>Localização</strong>
+            <span>{{ item.localizacao }}</span>
+          </div>
+          <div>
+            <strong>Anunciante</strong>
+            <span>{{ item.anuncianteNome || 'Não informado' }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <ng-template #notFound>
+    <div class="detail-shell" *ngIf="!loading">
+      <div class="detail-box">Anúncio não encontrado.</div>
+    </div>
+  </ng-template>
+</section>

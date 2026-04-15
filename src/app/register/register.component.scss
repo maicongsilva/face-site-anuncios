@@ -1,38 +1,90 @@
-.registro-div{
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    justify-content: center;
-    width: 466px;
-    align-items: center;
-    height: 466px;
-    padding: 32px 56px 24px 56px;
-    border-radius: 4px 4px 0px 0px;
-    color: rgb(74, 74, 74);
-    margin-top: -1px;
-    background-color: rgb(255, 255, 255);
-    box-shadow: rgb(153 153 153 / 20%) 0px 2px 4px 0px;
-    box-sizing: border-box;
-    font-family: "Nunito Sans", "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
-  
-    font-size: 16px;
-    font-weight: bold;
+.register-page {
+  min-height: calc(100vh - 64px);
+  padding: 32px 20px;
+  background: linear-gradient(135deg, #eef4ff 0%, #f8fafc 100%);
+}
+
+.register-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.register-info {
+  padding: 32px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #1e293b 0%, #2563eb 100%);
+  color: #fff;
+  box-shadow: 0 24px 50px rgba(37, 99, 235, 0.18);
+}
+
+.register-pill {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.card {
+  display: flex;
+  justify-content: center;
+}
+
+.registro-div {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+  width: 100%;
+  align-items: center;
+  min-height: 520px;
+  padding: 32px 32px 24px 32px;
+  border-radius: 24px;
+  color: #334155;
+  background-color: #ffffff;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+  box-sizing: border-box;
+  font-family: "Nunito Sans", "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.registro-form {
+  width: 100%;
+  display: grid;
+  gap: 12px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.button-salvar {
+  display: block;
+  width: 100%;
+}
+
+.button-salvar button {
+  width: 100%;
+  height: 48px;
+  border-radius: 999px;
+}
+
+@media (max-width: 900px) {
+  .register-shell {
+    grid-template-columns: 1fr;
   }
 
-  .card{
-    display: flex;
-    justify-content: center;
+  .form-row {
+    grid-template-columns: 1fr;
   }
-
-  .mat-form-field-infix {
-        width: 244px;
-  }
-
-  .button-salvar {
-    display: table-cell;
-    max-width: 600px;
-  }
-
-  .mat-button {
-    width: 244px;
-  }
+}

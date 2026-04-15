@@ -1,0 +1,117 @@
+<div class="profile-page" *ngIf="currentUser$ | async as user">
+  <div class="profile-shell">
+    <mat-card class="profile-card">
+      <mat-card-content>
+        <div class="profile-header">
+          <div>
+            <span class="profile-badge">Minha conta</span>
+            <h2>{{ user.nome }}</h2>
+            <p>Seus dados e seus anúncios estão integrados com o backend real.</p>
+          </div>
+        </div>
+
+        <div class="profile-grid">
+          <div class="profile-item">
+            <strong>Email</strong>
+            <span>{{ user.email }}</span>
+          </div>
+          <div class="profile-item">
+            <strong>Documento</strong>
+            <span>{{ user.documento || 'Não informado' }}</span>
+          </div>
+          <div class="profile-item">
+            <strong>Telefone</strong>
+            <span>{{ user.telefone || 'Não informado' }}</span>
+          </div>
+          <div class="profile-item">
+            <strong>Perfil</strong>
+            <span>{{ user.role || 'USER' }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="profile-card publish-card">
+      <mat-card-content>
+        <h3>{{ editingId ? 'Editar anúncio' : 'Publicar novo anúncio' }}</h3>
+
+        <form [formGroup]="anuncioForm" class="publish-form" (ngSubmit)="publicarAnuncio()">
+          <mat-form-field appearance="outline">
+            <mat-label>Título</mat-label>
+            <input matInput formControlName="titulo">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Categoria</mat-label>
+            <input matInput formControlName="categoria">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Localização</mat-label>
+            <input matInput formControlName="localizacao">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Preço</mat-label>
+            <input matInput type="number" formControlName="preco">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descrição</mat-label>
+            <textarea matInput rows="4" formControlName="descricao"></textarea>
+          </mat-form-field>
+
+          <div class="full-width upload-box">
+            <label for="anuncio-image"><strong>Imagem do anúncio</strong></label>
+            <input id="anuncio-image" type="file" accept="image/*" (change)="onImageSelected($event)">
+
+            <img *ngIf="previewImage" [src]="previewImage" alt="Prévia da imagem" class="preview-image">
+          </div>
+
+          <div class="form-actions">
+            <button mat-raised-button color="primary" type="submit" [disabled]="submitting">
+              {{ submitting ? 'Salvando...' : (editingId ? 'Salvar alterações' : 'Publicar anúncio') }}
+            </button>
+            <button *ngIf="editingId" mat-stroked-button type="button" (click)="cancelarEdicao()">
+              Cancelar
+            </button>
+          </div>
+        </form>
+
+        <p class="feedback" *ngIf="feedback">{{ feedback }}</p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="profile-card publish-card">
+      <mat-card-content>
+        <h3>Meus anúncios</h3>
+
+        <div class="my-ad-list" *ngIf="meusAnuncios.length; else emptyState">
+          <div class="ad-item" *ngFor="let anuncio of meusAnuncios">
+            <img *ngIf="anuncio.imagemUrl" [src]="anuncio.imagemUrl" [alt]="anuncio.titulo" class="ad-thumb">
+
+            <div class="ad-content">
+              <strong>{{ anuncio.titulo }}</strong>
+              <p>{{ anuncio.descricao }}</p>
+            </div>
+
+            <div class="ad-meta">
+              <span>{{ anuncio.categoria }}</span>
+              <span>{{ anuncio.localizacao }}</span>
+              <strong>{{ anuncio.preco | currency:'BRL':'symbol':'1.2-2' }}</strong>
+
+              <div class="ad-actions">
+                <button mat-button color="primary" type="button" (click)="editarAnuncio(anuncio)">Editar</button>
+                <button mat-button color="warn" type="button" (click)="excluirAnuncio(anuncio)">Excluir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #emptyState>
+          <p class="feedback">Você ainda não publicou anúncios.</p>
+        </ng-template>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

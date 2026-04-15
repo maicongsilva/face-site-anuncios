@@ -1,35 +1,62 @@
-<div class="card">
-  <div class="registro-div">
-    <form class="registro-form" [formGroup]="registerForm" (submit)="onSubmit()">
-      <mat-form-field class="nome">
-        <mat-label>Nome</mat-label>
-        <input matInput placeholder="Ex. nome" formControlName="nome">
-      </mat-form-field>
+<div class="register-page">
+  <div class="register-shell">
+    <div class="register-info">
+      <span class="register-pill">Cadastro rápido</span>
+      <h1>Crie sua conta</h1>
+      <p>Seu acesso será criado com autenticação real e token JWT para navegação protegida.</p>
+    </div>
 
-      <mat-form-field class="e-mail">
-        <mat-label>Email</mat-label>
-        <input type="email" matInput formControlName="email" [errorStateMatcher]="matcher"
+    <div class="card">
+      <div class="registro-div">
+        <form class="registro-form" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+          <mat-form-field class="nome" appearance="outline">
+            <mat-label>Nome</mat-label>
+            <input matInput placeholder="Ex. nome" formControlName="nome">
+          </mat-form-field>
+
+          <mat-form-field class="e-mail" appearance="outline">
+            <mat-label>Email</mat-label>
+            <input type="email" matInput formControlName="email" [errorStateMatcher]="matcher"
               placeholder="Ex. pat@exemplo.com">
-        <mat-hint>Errors appear instantly!</mat-hint>
-        <mat-error *ngIf="email.hasError('email') && !email.hasError('required')">
-          Please enter a valid email address
-        </mat-error>
-        <mat-error *ngIf="email.hasError('required')">
-          Email is <strong>required</strong>
-        </mat-error>
-      </mat-form-field>
+            <mat-hint>Informe um email válido</mat-hint>
+            <mat-error *ngIf="emailControl.hasError('email') && !emailControl.hasError('required')">
+              Digite um email válido
+            </mat-error>
+            <mat-error *ngIf="emailControl.hasError('required')">
+              Email é obrigatório
+            </mat-error>
+          </mat-form-field>
 
-      <mat-form-field appearance="fill">
-        <mat-label>password</mat-label>
-        <input matInput [type]="hide ? 'password' : 'text'" formControlName="senha">
-        <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
-          <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-        </button>
-      </mat-form-field>
-      
-      <div class="button-salvar">
-        <button mat-button color="primary">Salvar</button>
+          <mat-form-field appearance="outline">
+            <mat-label>Senha</mat-label>
+            <input matInput [type]="hide ? 'password' : 'text'" formControlName="senha">
+            <button mat-icon-button matSuffix type="button" (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+              <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+          </mat-form-field>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Documento</mat-label>
+              <input matInput formControlName="documento" placeholder="CPF ou documento">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Telefone</mat-label>
+              <input matInput formControlName="telefone" placeholder="(11) 99999-9999">
+            </mat-form-field>
+          </div>
+
+          <div *ngIf="successmessage" class="alert alert-success mt-3">{{ successmessage }}</div>
+          <div *ngIf="errormessage" class="alert alert-danger mt-3">{{ errormessage }}</div>
+
+          <div class="button-salvar">
+            <button mat-raised-button color="primary" [disabled]="registerForm.invalid">Criar conta</button>
+          </div>
+
+          <p class="mt-3 text-center">Já tem conta? <a [routerLink]="['/login']">Entrar</a></p>
+        </form>
       </div>
-    </form>
+    </div>
   </div>
 </div>
