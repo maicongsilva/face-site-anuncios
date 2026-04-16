@@ -12,7 +12,8 @@
       mat-stroked-button
       type="button"
       *ngFor="let categoria of categoriasRapidas"
-      [color]="filtroCategoria === categoria ? 'primary' : undefined"
+      class="category-chip"
+      [class.active-chip]="filtroCategoria === categoria"
       (click)="aplicarCategoriaRapida(categoria)">
       {{ categoria }}
     </button>

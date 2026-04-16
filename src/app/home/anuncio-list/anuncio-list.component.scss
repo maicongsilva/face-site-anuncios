@@ -39,6 +39,12 @@
   margin-bottom: 16px;
 }
 
+.category-chip.active-chip {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
 .filters-box {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
