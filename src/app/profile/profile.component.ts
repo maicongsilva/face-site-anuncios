@@ -15,11 +15,19 @@ export class ProfileComponent implements OnInit {
   currentUser$: Observable<AuthUser | null> = this.authService.currentUser$;
   meusAnuncios: Anuncio[] = [];
   submitting = false;
+  updatingProfile = false;
   feedback = '';
+  profileFeedback = '';
   editingId: number | null = null;
   previewImage: string | null = null;
   selectedImageFile: File | null = null;
   currentImageUrl: string | null = null;
+
+  profileForm = this.fb.group({
+    nome: this.fb.control('', { nonNullable: true, validators: [Validators.required, Validators.minLength(3)] }),
+    documento: this.fb.control('', { nonNullable: true }),
+    telefone: this.fb.control('', { nonNullable: true })
+  });
 
   anuncioForm = this.fb.group({
     titulo: this.fb.control('', { nonNullable: true, validators: [Validators.required, Validators.minLength(3)] }),
@@ -37,8 +45,41 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.authService.fetchMe().subscribe({
-      next: () => this.carregarMeusAnuncios(),
+      next: (user) => {
+        this.profileForm.patchValue({
+          nome: user.nome || '',
+          documento: user.documento || '',
+          telefone: user.telefone || ''
+        });
+        this.carregarMeusAnuncios();
+      },
       error: () => this.authService.logout()
+    });
+  }
+
+  salvarPerfil(): void {
+    if (this.profileForm.invalid) {
+      this.profileForm.markAllAsTouched();
+      return;
+    }
+
+    this.updatingProfile = true;
+    this.profileFeedback = '';
+
+    const formValue = this.profileForm.getRawValue();
+    this.authService.updateProfile({
+      nome: formValue.nome,
+      documento: formValue.documento || undefined,
+      telefone: formValue.telefone || undefined
+    }).subscribe({
+      next: () => {
+        this.updatingProfile = false;
+        this.profileFeedback = 'Perfil atualizado com sucesso.';
+      },
+      error: () => {
+        this.updatingProfile = false;
+        this.profileFeedback = 'Não foi possível atualizar seu perfil agora.';
+      }
     });
   }
 

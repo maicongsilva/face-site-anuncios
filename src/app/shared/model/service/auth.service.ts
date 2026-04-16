@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
-import { AuthResponse, AuthUser } from '../auth.model';
+import { AuthResponse, AuthUser, UpdateProfilePayload } from '../auth.model';
 import { NovoUsuario } from '../../../register/novo-usuario';
 
 @Injectable({
@@ -46,6 +46,15 @@ export class AuthService {
         localStorage.setItem(this.userKey, JSON.stringify(user));
         this.currentUserSubject.next(user);
         this.authStateSubject.next(true);
+      })
+    );
+  }
+
+  updateProfile(payload: UpdateProfilePayload): Observable<AuthUser> {
+    return this.http.put<AuthUser>(`${this.apiUrl}/user/me`, payload).pipe(
+      tap((user) => {
+        localStorage.setItem(this.userKey, JSON.stringify(user));
+        this.currentUserSubject.next(user);
       })
     );
   }

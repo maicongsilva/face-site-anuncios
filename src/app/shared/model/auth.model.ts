@@ -13,3 +13,9 @@ export interface AuthResponse {
   token: string;
   user: AuthUser;
 }
+
+export interface UpdateProfilePayload {
+  nome: string;
+  documento?: string;
+  telefone?: string;
+}
