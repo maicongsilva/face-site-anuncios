@@ -20,13 +20,15 @@ import { MatCardModule } from '@angular/material/card';
 import { ProfileComponent } from './profile/profile.component';
 import { AnuncioDetailComponent } from './anuncio-detail/anuncio-detail.component';
 import { AuthInterceptor } from './shared/interceptors/auth.interceptor';
+import { AdminComponent } from './admin/admin.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     RegisterComponent,
     ProfileComponent,
-    AnuncioDetailComponent
+    AnuncioDetailComponent,
+    AdminComponent
   ],
   providers: [
     {

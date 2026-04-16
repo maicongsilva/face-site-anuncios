@@ -22,6 +22,7 @@
 
       <ng-template #loggedMenu>
         <span class="user-name">Olá, {{ (currentUser$ | async)?.nome }}</span>
+        <button *ngIf="(currentUser$ | async)?.role === 'ADMIN'" mat-stroked-button class="action-btn secondary" [routerLink]="['/admin']">Admin</button>
         <button mat-stroked-button class="action-btn secondary" [routerLink]="['/minha-conta']">Minha conta</button>
         <button mat-flat-button class="action-btn danger" (click)="logout()">Sair</button>
       </ng-template>

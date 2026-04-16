@@ -78,6 +78,10 @@ export class AuthService {
     return this.hasToken();
   }
 
+  getCurrentUser(): AuthUser | null {
+    return this.currentUserSubject.value;
+  }
+
   private storeSession(response: AuthResponse): void {
     localStorage.setItem(this.tokenKey, response.token);
     localStorage.setItem(this.userKey, JSON.stringify(response.user));

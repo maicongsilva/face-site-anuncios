@@ -1,0 +1,41 @@
+<section class="admin-page">
+  <div class="admin-shell" *ngIf="loading">
+    <div class="admin-box">Carregando painel admin...</div>
+  </div>
+
+  <div class="admin-shell" *ngIf="!loading && dashboard as data">
+    <div class="admin-header">
+      <div>
+        <span class="admin-badge">Admin</span>
+        <h2>Painel do sistema</h2>
+        <p>Visão rápida dos principais números da plataforma.</p>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <mat-card class="stat-card">
+        <strong>Usuários</strong>
+        <span>{{ data.totalUsuarios }}</span>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <strong>Anúncios</strong>
+        <span>{{ data.totalAnuncios }}</span>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <strong>Anúncios ativos</strong>
+        <span>{{ data.totalAnunciosAtivos }}</span>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <strong>Favoritos</strong>
+        <span>{{ data.totalFavoritos }}</span>
+      </mat-card>
+    </div>
+  </div>
+
+  <div class="admin-shell" *ngIf="feedback && !loading">
+    <div class="admin-box">{{ feedback }}</div>
+  </div>
+</section>
