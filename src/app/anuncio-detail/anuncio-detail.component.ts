@@ -11,6 +11,7 @@ import { AuthService } from '../shared/model/service/auth.service';
 })
 export class AnuncioDetailComponent implements OnInit {
   anuncio: Anuncio | null = null;
+  relacionados: Anuncio[] = [];
   loading = true;
 
   constructor(
@@ -32,6 +33,10 @@ export class AnuncioDetailComponent implements OnInit {
       next: (anuncio) => {
         this.anuncio = anuncio;
         this.loading = false;
+
+        if (anuncio.id) {
+          this.carregarRelacionados(anuncio.id);
+        }
       },
       error: () => {
         this.loading = false;
@@ -72,5 +77,13 @@ export class AnuncioDetailComponent implements OnInit {
 
     const assunto = encodeURIComponent(`Interesse no anúncio ${this.anuncio?.titulo}`);
     return `mailto:${email}?subject=${assunto}`;
+  }
+
+  private carregarRelacionados(id: number): void {
+    this.anuncioService.buscarRelacionados(id, 3).subscribe({
+      next: (anuncios) => {
+        this.relacionados = anuncios;
+      }
+    });
   }
 }

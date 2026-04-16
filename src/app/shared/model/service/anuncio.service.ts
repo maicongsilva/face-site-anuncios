@@ -77,6 +77,13 @@ export class AnuncioService {
     );
   }
 
+  buscarRelacionados(id: number, limit = 3): Observable<Anuncio[]> {
+    const params = new HttpParams().set('limit', String(limit));
+    return this.http.get<Anuncio[]>(`${this.apiUrl}/${id}/relacionados`, { params }).pipe(
+      map((anuncios) => anuncios.map((anuncio) => this.normalizeAnuncio(anuncio)))
+    );
+  }
+
   criar(payload: Partial<Anuncio>): Observable<Anuncio> {
     return this.http.post<Anuncio>(this.apiUrl, payload).pipe(
       map((anuncio) => this.normalizeAnuncio(anuncio))

@@ -54,6 +54,27 @@
         </div>
       </mat-card-content>
     </mat-card>
+
+    <section class="related-section" *ngIf="relacionados.length">
+      <div class="related-header">
+        <h2>Anúncios relacionados</h2>
+        <p>Outras opções parecidas para você comparar.</p>
+      </div>
+
+      <div class="related-grid">
+        <mat-card class="related-card" *ngFor="let related of relacionados">
+          <img *ngIf="related.imagemUrl" [src]="related.imagemUrl" [alt]="related.titulo" class="related-image">
+          <mat-card-content>
+            <strong>{{ related.titulo }}</strong>
+            <span>{{ related.preco | currency:'BRL':'symbol':'1.2-2' }}</span>
+            <small>{{ related.localizacao }}</small>
+          </mat-card-content>
+          <mat-card-actions>
+            <a mat-button color="primary" [routerLink]="['/anuncios', related.id]">Ver anúncio</a>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </section>
   </div>
 
   <ng-template #notFound>
