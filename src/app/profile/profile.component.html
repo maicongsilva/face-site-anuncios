@@ -109,6 +109,39 @@
 
     <mat-card class="profile-card publish-card">
       <mat-card-content>
+        <h3>Meus favoritos</h3>
+
+        <div class="my-ad-list" *ngIf="meusFavoritos.length; else emptyFavorites">
+          <div class="ad-item" *ngFor="let anuncio of meusFavoritos">
+            <img *ngIf="anuncio.imagemUrl" [src]="anuncio.imagemUrl" [alt]="anuncio.titulo" class="ad-thumb">
+
+            <div class="ad-content">
+              <strong>{{ anuncio.titulo }}</strong>
+              <p>{{ anuncio.descricao }}</p>
+              <small class="ad-note">Anunciante: {{ anuncio.anuncianteNome || 'Não informado' }}</small>
+            </div>
+
+            <div class="ad-meta">
+              <span>{{ anuncio.categoria }}</span>
+              <span>{{ anuncio.localizacao }}</span>
+              <strong>{{ anuncio.preco | currency:'BRL':'symbol':'1.2-2' }}</strong>
+
+              <div class="ad-actions">
+                <a mat-button color="primary" [routerLink]="['/anuncios', anuncio.id]">Detalhes</a>
+                <button mat-button color="warn" type="button" (click)="removerFavorito(anuncio)">Remover</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #emptyFavorites>
+          <p class="feedback">Você ainda não favoritou anúncios.</p>
+        </ng-template>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="profile-card publish-card">
+      <mat-card-content>
         <h3>Meus anúncios</h3>
 
         <div class="my-ad-list" *ngIf="meusAnuncios.length; else emptyState">

@@ -14,6 +14,7 @@ import { AnuncioService } from '../shared/model/service/anuncio.service';
 export class ProfileComponent implements OnInit {
   currentUser$: Observable<AuthUser | null> = this.authService.currentUser$;
   meusAnuncios: Anuncio[] = [];
+  meusFavoritos: Anuncio[] = [];
   submitting = false;
   updatingProfile = false;
   feedback = '';
@@ -52,6 +53,7 @@ export class ProfileComponent implements OnInit {
           telefone: user.telefone || ''
         });
         this.carregarMeusAnuncios();
+        this.carregarFavoritos();
       },
       error: () => this.authService.logout()
     });
@@ -157,6 +159,7 @@ export class ProfileComponent implements OnInit {
     this.anuncioService.excluir(anuncio.id).subscribe({
       next: () => {
         this.meusAnuncios = this.meusAnuncios.filter(item => item.id !== anuncio.id);
+        this.meusFavoritos = this.meusFavoritos.filter(item => item.id !== anuncio.id);
         if (this.editingId === anuncio.id) {
           this.resetFormulario();
         }
@@ -164,6 +167,22 @@ export class ProfileComponent implements OnInit {
       },
       error: () => {
         this.feedback = 'Não foi possível excluir o anúncio.';
+      }
+    });
+  }
+
+  removerFavorito(anuncio: Anuncio): void {
+    if (!anuncio.id) {
+      return;
+    }
+
+    this.anuncioService.toggleFavorito(anuncio.id).subscribe({
+      next: () => {
+        this.meusFavoritos = this.meusFavoritos.filter(item => item.id !== anuncio.id);
+        this.feedback = 'Favorito removido com sucesso.';
+      },
+      error: () => {
+        this.feedback = 'Não foi possível atualizar os favoritos agora.';
       }
     });
   }
@@ -216,6 +235,13 @@ export class ProfileComponent implements OnInit {
     this.anuncioService.listarMeus().subscribe({
       next: (anuncios) => this.meusAnuncios = anuncios,
       error: () => this.meusAnuncios = []
+    });
+  }
+
+  private carregarFavoritos(): void {
+    this.anuncioService.listarFavoritos().subscribe({
+      next: (anuncios) => this.meusFavoritos = anuncios,
+      error: () => this.meusFavoritos = []
     });
   }
 }
