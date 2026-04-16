@@ -11,4 +11,6 @@ export interface Anuncio {
   dataCriacao?: string;
   anuncianteId?: number;
   anuncianteNome?: string;
+  anuncianteTelefone?: string;
+  anuncianteEmail?: string;
 }

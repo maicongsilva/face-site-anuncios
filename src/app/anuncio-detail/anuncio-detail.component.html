@@ -26,6 +26,14 @@
             <span>{{ item.anuncianteNome || 'Não informado' }}</span>
           </div>
           <div>
+            <strong>Telefone</strong>
+            <span>{{ item.anuncianteTelefone || 'Não informado' }}</span>
+          </div>
+          <div>
+            <strong>Email</strong>
+            <span>{{ item.anuncianteEmail || 'Não informado' }}</span>
+          </div>
+          <div>
             <strong>Favoritos</strong>
             <span>❤️ {{ item.totalFavoritos || 0 }}</span>
           </div>
@@ -35,6 +43,14 @@
           <button mat-raised-button color="primary" type="button" (click)="toggleFavorito()">
             {{ item.favoritado ? 'Desfavoritar' : 'Favoritar' }}
           </button>
+
+          <a *ngIf="whatsappLink" mat-stroked-button color="accent" [href]="whatsappLink" target="_blank" rel="noopener noreferrer">
+            Falar no WhatsApp
+          </a>
+
+          <a *ngIf="emailLink" mat-stroked-button [href]="emailLink">
+            Enviar email
+          </a>
         </div>
       </mat-card-content>
     </mat-card>

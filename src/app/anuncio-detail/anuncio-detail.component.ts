@@ -53,4 +53,24 @@ export class AnuncioDetailComponent implements OnInit {
       next: (anuncio) => this.anuncio = anuncio
     });
   }
+
+  get whatsappLink(): string | null {
+    const telefone = this.anuncio?.anuncianteTelefone?.replace(/\D/g, '');
+    if (!telefone) {
+      return null;
+    }
+
+    const texto = encodeURIComponent(`Olá! Tenho interesse no anúncio ${this.anuncio?.titulo}.`);
+    return `https://wa.me/55${telefone}?text=${texto}`;
+  }
+
+  get emailLink(): string | null {
+    const email = this.anuncio?.anuncianteEmail;
+    if (!email) {
+      return null;
+    }
+
+    const assunto = encodeURIComponent(`Interesse no anúncio ${this.anuncio?.titulo}`);
+    return `mailto:${email}?subject=${assunto}`;
+  }
 }
