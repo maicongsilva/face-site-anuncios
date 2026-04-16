@@ -62,6 +62,7 @@
       <div class="image-wrap">
         <img mat-card-image [src]="card.image" [alt]="card.titulo">
         <span class="tag">{{ card.categoria }}</span>
+        <span class="new-badge" *ngIf="card.isNovo">Novo</span>
       </div>
       <mat-card-content>
         <h3>{{ card.titulo }}</h3>
@@ -76,6 +77,8 @@
           <small>Anunciante: {{ card.anuncianteNome }}</small>
           <small class="favorite-count">❤️ {{ card.totalFavoritos || 0 }}</small>
         </div>
+
+        <small class="publish-hint" *ngIf="card.isNovo">Publicado recentemente</small>
       </mat-card-content>
       <mat-card-actions>
         <a mat-flat-button color="primary" [routerLink]="['/anuncios', card.id]">Detalhes</a>

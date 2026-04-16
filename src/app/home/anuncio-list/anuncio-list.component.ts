@@ -10,7 +10,7 @@ import { AuthService } from 'src/app/shared/model/service/auth.service';
   styleUrls: ['./anuncio-list.component.scss']
 })
 export class AnuncioListComponent implements OnInit {
-  cards: Array<Anuncio & { image: string }> = [];
+  cards: Array<Anuncio & { image: string; isNovo: boolean }> = [];
   loading = true;
   feedback = '';
   filtroTermo = '';
@@ -101,7 +101,11 @@ export class AnuncioListComponent implements OnInit {
     this.anuncioService.toggleFavorito(card.id).subscribe({
       next: (updated) => {
         this.cards = this.cards.map((item) => item.id === updated.id
-          ? { ...updated, image: updated.imagemUrl || this.getImageByCategory(updated.categoria) }
+          ? {
+              ...updated,
+              image: updated.imagemUrl || this.getImageByCategory(updated.categoria),
+              isNovo: item.isNovo
+            }
           : item);
       },
       error: () => {
@@ -130,7 +134,8 @@ export class AnuncioListComponent implements OnInit {
       next: (response) => {
         this.cards = response.content.map((anuncio) => ({
           ...anuncio,
-          image: anuncio.imagemUrl || this.getImageByCategory(anuncio.categoria)
+          image: anuncio.imagemUrl || this.getImageByCategory(anuncio.categoria),
+          isNovo: this.isAnuncioNovo(anuncio.dataCriacao)
         }));
         this.totalPaginas = response.totalPages;
         this.totalResultados = response.totalElements;
@@ -156,6 +161,17 @@ export class AnuncioListComponent implements OnInit {
     }
 
     return 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=900&q=80';
+  }
+
+  private isAnuncioNovo(dataCriacao?: string): boolean {
+    if (!dataCriacao) {
+      return false;
+    }
+
+    const data = new Date(dataCriacao);
+    const diferenca = Date.now() - data.getTime();
+    const doisDiasEmMs = 2 * 24 * 60 * 60 * 1000;
+    return diferenca <= doisDiasEmMs;
   }
 }
 
