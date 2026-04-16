@@ -102,7 +102,12 @@
     </button>
   </div>
 
-  <div class="status-box empty" *ngIf="!loading && !cards.length">
-    Nenhum anúncio disponível no momento.
+  <div class="status-box empty empty-state" *ngIf="!loading && !cards.length">
+    <div class="empty-icon">🔎</div>
+    <h3>Nenhum anúncio encontrado</h3>
+    <p>Tente ajustar os filtros ou limpar a busca para ver mais resultados.</p>
+    <button mat-flat-button color="primary" type="button" (click)="limparFiltros()">
+      Limpar filtros
+    </button>
   </div>
 </section>
