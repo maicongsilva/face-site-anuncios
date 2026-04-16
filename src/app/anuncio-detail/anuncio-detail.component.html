@@ -44,6 +44,14 @@
             {{ item.favoritado ? 'Desfavoritar' : 'Favoritar' }}
           </button>
 
+          <button mat-stroked-button color="primary" type="button" (click)="compartilharAnuncio()">
+            Compartilhar
+          </button>
+
+          <button mat-stroked-button type="button" (click)="copyLink()">
+            Copiar link
+          </button>
+
           <a *ngIf="whatsappLink" mat-stroked-button color="accent" [href]="whatsappLink" target="_blank" rel="noopener noreferrer">
             Falar no WhatsApp
           </a>
@@ -51,6 +59,10 @@
           <a *ngIf="emailLink" mat-stroked-button [href]="emailLink">
             Enviar email
           </a>
+        </div>
+
+        <div class="share-feedback" *ngIf="shareFeedback">
+          {{ shareFeedback }}
         </div>
       </mat-card-content>
     </mat-card>

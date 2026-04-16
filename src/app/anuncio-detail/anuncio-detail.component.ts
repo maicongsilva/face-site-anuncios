@@ -13,6 +13,7 @@ export class AnuncioDetailComponent implements OnInit {
   anuncio: Anuncio | null = null;
   relacionados: Anuncio[] = [];
   loading = true;
+  shareFeedback = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -79,11 +80,55 @@ export class AnuncioDetailComponent implements OnInit {
     return `mailto:${email}?subject=${assunto}`;
   }
 
+  compartilharAnuncio(): void {
+    if (!this.anuncio) {
+      return;
+    }
+
+    const url = this.getCurrentUrl();
+
+    if (navigator.share) {
+      navigator.share({
+        title: this.anuncio.titulo,
+        text: `Olha esse anúncio: ${this.anuncio.titulo}`,
+        url
+      }).then(() => {
+        this.shareFeedback = 'Anúncio compartilhado com sucesso.';
+      }).catch(() => {
+        this.copyLink();
+      });
+      return;
+    }
+
+    this.copyLink();
+  }
+
+  copyLink(): void {
+    const url = this.getCurrentUrl();
+
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(url)
+        .then(() => {
+          this.shareFeedback = 'Link copiado para a área de transferência.';
+        })
+        .catch(() => {
+          this.shareFeedback = 'Não foi possível copiar o link agora.';
+        });
+      return;
+    }
+
+    this.shareFeedback = 'Copie o link direto da barra do navegador.';
+  }
+
   private carregarRelacionados(id: number): void {
     this.anuncioService.buscarRelacionados(id, 3).subscribe({
       next: (anuncios) => {
         this.relacionados = anuncios;
       }
     });
+  }
+
+  private getCurrentUrl(): string {
+    return window.location.href;
   }
 }
