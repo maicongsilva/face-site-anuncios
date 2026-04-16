@@ -62,7 +62,7 @@ export class AnuncioListComponent implements OnInit {
     }
 
     this.paginaAtual -= 1;
-    this.carregarAnuncios();
+    this.carregarAnuncios(true);
   }
 
   irParaProximaPagina(): void {
@@ -71,7 +71,11 @@ export class AnuncioListComponent implements OnInit {
     }
 
     this.paginaAtual += 1;
-    this.carregarAnuncios();
+    this.carregarAnuncios(true);
+  }
+
+  voltarAoTopo(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   atualizarCampoTexto(campo: 'filtroTermo' | 'filtroCategoria' | 'filtroLocalizacao', event: Event): void {
@@ -106,9 +110,13 @@ export class AnuncioListComponent implements OnInit {
     });
   }
 
-  private carregarAnuncios(): void {
+  private carregarAnuncios(scrollToTop = false): void {
     this.loading = true;
     this.feedback = '';
+
+    if (scrollToTop) {
+      this.voltarAoTopo();
+    }
 
     const [sortBy, direction] = this.ordenacao.split(',');
 

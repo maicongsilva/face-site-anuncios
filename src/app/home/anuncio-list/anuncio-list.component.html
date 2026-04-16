@@ -94,6 +94,9 @@
     <button mat-stroked-button color="primary" type="button" (click)="irParaProximaPagina()" [disabled]="paginaAtual >= totalPaginas - 1">
       Próxima
     </button>
+    <button mat-flat-button color="accent" type="button" (click)="voltarAoTopo()">
+      Voltar ao topo
+    </button>
   </div>
 
   <div class="status-box empty" *ngIf="!loading && !cards.length">
