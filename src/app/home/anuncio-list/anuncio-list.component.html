@@ -4,6 +4,38 @@
     <p>Agora a vitrine está ligada ao backend real da aplicação.</p>
   </div>
 
+  <div class="filters-box">
+    <label class="filter-field">
+      <span>Buscar</span>
+      <input [value]="filtroTermo" (input)="atualizarCampoTexto('filtroTermo', $event)" placeholder="Título ou descrição">
+    </label>
+
+    <label class="filter-field">
+      <span>Categoria</span>
+      <input [value]="filtroCategoria" (input)="atualizarCampoTexto('filtroCategoria', $event)" placeholder="Ex: Tecnologia">
+    </label>
+
+    <label class="filter-field">
+      <span>Localização</span>
+      <input [value]="filtroLocalizacao" (input)="atualizarCampoTexto('filtroLocalizacao', $event)" placeholder="Ex: São Paulo">
+    </label>
+
+    <label class="filter-field">
+      <span>Preço mínimo</span>
+      <input type="number" [value]="filtroPrecoMin ?? ''" (input)="atualizarCampoNumero('filtroPrecoMin', $event)">
+    </label>
+
+    <label class="filter-field">
+      <span>Preço máximo</span>
+      <input type="number" [value]="filtroPrecoMax ?? ''" (input)="atualizarCampoNumero('filtroPrecoMax', $event)">
+    </label>
+
+    <div class="filter-actions">
+      <button mat-raised-button color="primary" type="button" (click)="aplicarFiltros()">Filtrar</button>
+      <button mat-stroked-button type="button" (click)="limparFiltros()">Limpar</button>
+    </div>
+  </div>
+
   <div class="status-box" *ngIf="loading">
     Carregando anúncios...
   </div>

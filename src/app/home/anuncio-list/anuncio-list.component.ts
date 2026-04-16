@@ -13,6 +13,11 @@ export class AnuncioListComponent implements OnInit {
   cards: Array<Anuncio & { image: string }> = [];
   loading = true;
   feedback = '';
+  filtroTermo = '';
+  filtroCategoria = '';
+  filtroLocalizacao = '';
+  filtroPrecoMin: number | null = null;
+  filtroPrecoMax: number | null = null;
 
   constructor(
     private anuncioService: AnuncioService,
@@ -21,18 +26,30 @@ export class AnuncioListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.anuncioService.listarPublicos().subscribe({
-      next: (anuncios) => {
-        this.cards = anuncios.map((anuncio) => ({
-          ...anuncio,
-          image: anuncio.imagemUrl || this.getImageByCategory(anuncio.categoria)
-        }));
-        this.loading = false;
-      },
-      error: () => {
-        this.loading = false;
-      }
-    });
+    this.carregarAnuncios();
+  }
+
+  aplicarFiltros(): void {
+    this.carregarAnuncios();
+  }
+
+  limparFiltros(): void {
+    this.filtroTermo = '';
+    this.filtroCategoria = '';
+    this.filtroLocalizacao = '';
+    this.filtroPrecoMin = null;
+    this.filtroPrecoMax = null;
+    this.carregarAnuncios();
+  }
+
+  atualizarCampoTexto(campo: 'filtroTermo' | 'filtroCategoria' | 'filtroLocalizacao', event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this[campo] = value;
+  }
+
+  atualizarCampoNumero(campo: 'filtroPrecoMin' | 'filtroPrecoMax', event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this[campo] = value ? Number(value) : null;
   }
 
   toggleFavorito(card: Anuncio & { image: string }): void {
@@ -53,6 +70,32 @@ export class AnuncioListComponent implements OnInit {
       },
       error: () => {
         this.feedback = 'Não foi possível atualizar os favoritos agora.';
+      }
+    });
+  }
+
+  private carregarAnuncios(): void {
+    this.loading = true;
+    this.feedback = '';
+
+    this.anuncioService.listarPublicos({
+      termo: this.filtroTermo,
+      categoria: this.filtroCategoria,
+      localizacao: this.filtroLocalizacao,
+      precoMin: this.filtroPrecoMin,
+      precoMax: this.filtroPrecoMax
+    }).subscribe({
+      next: (anuncios) => {
+        this.cards = anuncios.map((anuncio) => ({
+          ...anuncio,
+          image: anuncio.imagemUrl || this.getImageByCategory(anuncio.categoria)
+        }));
+        this.feedback = anuncios.length ? '' : 'Nenhum anúncio encontrado com os filtros informados.';
+        this.loading = false;
+      },
+      error: () => {
+        this.feedback = 'Não foi possível carregar os anúncios agora.';
+        this.loading = false;
       }
     });
   }
