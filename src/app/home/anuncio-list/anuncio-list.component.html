@@ -7,6 +7,17 @@
     <div class="market-badge">{{ totalResultados }} resultado(s)</div>
   </div>
 
+  <div class="quick-categories">
+    <button
+      mat-stroked-button
+      type="button"
+      *ngFor="let categoria of categoriasRapidas"
+      [color]="filtroCategoria === categoria ? 'primary' : undefined"
+      (click)="aplicarCategoriaRapida(categoria)">
+      {{ categoria }}
+    </button>
+  </div>
+
   <div class="filters-box">
     <label class="filter-field">
       <span>Buscar</span>

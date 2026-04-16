@@ -23,6 +23,7 @@ export class AnuncioListComponent implements OnInit {
   totalResultados = 0;
   readonly pageSize = 6;
   ordenacao = 'dataCriacao,desc';
+  readonly categoriasRapidas = ['Tecnologia', 'Móveis', 'Esporte', 'Imóveis'];
 
   constructor(
     private anuncioService: AnuncioService,
@@ -52,6 +53,12 @@ export class AnuncioListComponent implements OnInit {
 
   alterarOrdenacao(event: Event): void {
     this.ordenacao = (event.target as HTMLSelectElement).value;
+    this.paginaAtual = 0;
+    this.carregarAnuncios();
+  }
+
+  aplicarCategoriaRapida(categoria: string): void {
+    this.filtroCategoria = this.filtroCategoria === categoria ? '' : categoria;
     this.paginaAtual = 0;
     this.carregarAnuncios();
   }

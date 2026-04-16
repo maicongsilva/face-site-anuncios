@@ -32,6 +32,13 @@
   white-space: nowrap;
 }
 
+.quick-categories {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
 .filters-box {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
