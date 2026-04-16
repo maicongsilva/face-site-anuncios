@@ -14,6 +14,7 @@ export class AnuncioDetailComponent implements OnInit {
   relacionados: Anuncio[] = [];
   loading = true;
   shareFeedback = '';
+  selectedImageUrl: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -23,25 +24,15 @@ export class AnuncioDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.route.paramMap.subscribe((params) => {
+      const id = Number(params.get('id'));
 
-    if (!id) {
-      this.loading = false;
-      return;
-    }
-
-    this.anuncioService.buscarPorId(id).subscribe({
-      next: (anuncio) => {
-        this.anuncio = anuncio;
+      if (!id) {
         this.loading = false;
-
-        if (anuncio.id) {
-          this.carregarRelacionados(anuncio.id);
-        }
-      },
-      error: () => {
-        this.loading = false;
+        return;
       }
+
+      this.carregarAnuncio(id);
     });
   }
 
@@ -56,8 +47,15 @@ export class AnuncioDetailComponent implements OnInit {
     }
 
     this.anuncioService.toggleFavorito(this.anuncio.id).subscribe({
-      next: (anuncio) => this.anuncio = anuncio
+      next: (anuncio) => {
+        this.anuncio = anuncio;
+        this.selectedImageUrl = anuncio.imagemUrl || anuncio.imagens?.[0] || null;
+      }
     });
+  }
+
+  selecionarImagem(url: string): void {
+    this.selectedImageUrl = url;
   }
 
   get whatsappLink(): string | null {
@@ -124,6 +122,26 @@ export class AnuncioDetailComponent implements OnInit {
     this.anuncioService.buscarRelacionados(id, 3).subscribe({
       next: (anuncios) => {
         this.relacionados = anuncios;
+      }
+    });
+  }
+
+  private carregarAnuncio(id: number): void {
+    this.loading = true;
+    this.shareFeedback = '';
+
+    this.anuncioService.buscarPorId(id).subscribe({
+      next: (anuncio) => {
+        this.anuncio = anuncio;
+        this.selectedImageUrl = anuncio.imagemUrl || anuncio.imagens?.[0] || null;
+        this.loading = false;
+
+        if (anuncio.id) {
+          this.carregarRelacionados(anuncio.id);
+        }
+      },
+      error: () => {
+        this.loading = false;
       }
     });
   }

@@ -103,6 +103,24 @@
   border-radius: 12px;
 }
 
+.preview-gallery {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.preview-thumb {
+  width: 96px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid transparent;
+}
+
+.preview-thumb.primary-thumb {
+  border-color: #2563eb;
+}
+
 .form-actions {
   grid-column: 1 / -1;
   display: flex;

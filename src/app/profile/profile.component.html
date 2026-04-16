@@ -87,10 +87,18 @@
           </mat-form-field>
 
           <div class="full-width upload-box">
-            <label for="anuncio-image"><strong>Imagem do anúncio</strong></label>
-            <input id="anuncio-image" type="file" accept="image/*" (change)="onImageSelected($event)">
+            <label for="anuncio-image"><strong>Fotos do anúncio</strong></label>
+            <input id="anuncio-image" type="file" accept="image/*" multiple (change)="onImageSelected($event)">
+            <small>Selecione até 6 imagens para criar uma galeria mais atrativa.</small>
 
-            <img *ngIf="previewImage" [src]="previewImage" alt="Prévia da imagem" class="preview-image">
+            <div class="preview-gallery" *ngIf="previewImages.length">
+              <img
+                *ngFor="let image of previewImages; let first = first"
+                [src]="image"
+                alt="Prévia da imagem"
+                class="preview-thumb"
+                [class.primary-thumb]="first">
+            </div>
           </div>
 
           <div class="form-actions">

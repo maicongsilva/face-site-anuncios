@@ -5,7 +5,18 @@
 
   <div class="detail-shell" *ngIf="!loading && anuncio as item; else notFound">
     <mat-card class="detail-card">
-      <img *ngIf="item.imagemUrl" [src]="item.imagemUrl" [alt]="item.titulo" class="detail-image">
+      <img *ngIf="selectedImageUrl || item.imagemUrl" [src]="selectedImageUrl || item.imagemUrl" [alt]="item.titulo" class="detail-image">
+
+      <div class="thumb-gallery" *ngIf="(item.imagens?.length || 0) > 1">
+        <button
+          type="button"
+          class="thumb-button"
+          *ngFor="let image of item.imagens"
+          [class.active-thumb]="selectedImageUrl === image"
+          (click)="selecionarImagem(image)">
+          <img [src]="image" [alt]="item.titulo" class="thumb-image">
+        </button>
+      </div>
 
       <mat-card-content>
         <span class="detail-tag">{{ item.categoria }}</span>

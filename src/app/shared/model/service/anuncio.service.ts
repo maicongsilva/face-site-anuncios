@@ -99,6 +99,15 @@ export class AnuncioService {
     );
   }
 
+  uploadImagens(id: number, files: File[]): Observable<Anuncio> {
+    const formData = new FormData();
+    files.forEach((file) => formData.append('files', file));
+
+    return this.http.post<Anuncio>(`${this.apiUrl}/${id}/imagens`, formData).pipe(
+      map((anuncio) => this.normalizeAnuncio(anuncio))
+    );
+  }
+
   toggleFavorito(id: number): Observable<Anuncio> {
     return this.http.post<Anuncio>(`${this.apiUrl}/${id}/favorito`, {}).pipe(
       map((anuncio) => this.normalizeAnuncio(anuncio))
@@ -116,9 +125,14 @@ export class AnuncioService {
   }
 
   private normalizeAnuncio(anuncio: Anuncio): Anuncio {
+    const imagens = (anuncio.imagens || [])
+      .map((imagem) => this.resolveImageUrl(imagem))
+      .filter((imagem): imagem is string => !!imagem);
+
     return {
       ...anuncio,
-      imagemUrl: this.resolveImageUrl(anuncio.imagemUrl)
+      imagens,
+      imagemUrl: this.resolveImageUrl(anuncio.imagemUrl) || imagens[0]
     };
   }
 

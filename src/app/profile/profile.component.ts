@@ -21,7 +21,9 @@ export class ProfileComponent implements OnInit {
   profileFeedback = '';
   editingId: number | null = null;
   previewImage: string | null = null;
+  previewImages: string[] = [];
   selectedImageFile: File | null = null;
+  selectedGalleryFiles: File[] = [];
   currentImageUrl: string | null = null;
 
   profileForm = this.fb.group({
@@ -110,6 +112,10 @@ export class ProfileComponent implements OnInit {
 
     request$.pipe(
       switchMap((anuncio) => {
+        if (this.selectedGalleryFiles.length > 1 && anuncio.id) {
+          return this.anuncioService.uploadImagens(anuncio.id, this.selectedGalleryFiles);
+        }
+
         if (this.selectedImageFile && anuncio.id) {
           return this.anuncioService.uploadImagem(anuncio.id, this.selectedImageFile);
         }
@@ -140,7 +146,9 @@ export class ProfileComponent implements OnInit {
     this.editingId = anuncio.id || null;
     this.currentImageUrl = anuncio.imagemUrl || null;
     this.previewImage = anuncio.imagemUrl || null;
+    this.previewImages = anuncio.imagens?.length ? anuncio.imagens : (anuncio.imagemUrl ? [anuncio.imagemUrl] : []);
     this.selectedImageFile = null;
+    this.selectedGalleryFiles = [];
     this.anuncioForm.patchValue({
       titulo: anuncio.titulo,
       descricao: anuncio.descricao,
@@ -195,13 +203,16 @@ export class ProfileComponent implements OnInit {
       return;
     }
 
-    this.selectedImageFile = file;
+    const files = Array.from(input.files || []);
+    if (!files.length) {
+      return;
+    }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.previewImage = typeof reader.result === 'string' ? reader.result : null;
-    };
-    reader.readAsDataURL(file);
+    this.selectedGalleryFiles = files;
+    this.selectedImageFile = files[0] || null;
+    this.previewImage = null;
+    this.previewImages = files.map((item) => URL.createObjectURL(item));
+    this.previewImage = this.previewImages[0] || null;
   }
 
   cancelarEdicao(): void {
@@ -212,7 +223,9 @@ export class ProfileComponent implements OnInit {
   private resetFormulario(): void {
     this.editingId = null;
     this.previewImage = null;
+    this.previewImages = [];
     this.selectedImageFile = null;
+    this.selectedGalleryFiles = [];
     this.currentImageUrl = null;
     this.anuncioForm.reset({
       titulo: '',
