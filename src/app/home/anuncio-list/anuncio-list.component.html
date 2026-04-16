@@ -4,7 +4,7 @@
       <h2>Anúncios em destaque</h2>
       <p>Explore ofertas reais publicadas pelos usuários da plataforma.</p>
     </div>
-    <div class="market-badge">{{ cards.length }} resultado(s)</div>
+    <div class="market-badge">{{ totalResultados }} resultado(s)</div>
   </div>
 
   <div class="filters-box">
@@ -31,6 +31,16 @@
     <label class="filter-field">
       <span>Preço máximo</span>
       <input type="number" [value]="filtroPrecoMax ?? ''" (input)="atualizarCampoNumero('filtroPrecoMax', $event)">
+    </label>
+
+    <label class="filter-field sort-field">
+      <span>Ordenar por</span>
+      <select [value]="ordenacao" (change)="alterarOrdenacao($event)">
+        <option value="dataCriacao,desc">Mais recentes</option>
+        <option value="preco,asc">Menor preço</option>
+        <option value="preco,desc">Maior preço</option>
+        <option value="titulo,asc">Título A-Z</option>
+      </select>
     </label>
 
     <div class="filter-actions">
@@ -74,6 +84,16 @@
         </button>
       </mat-card-actions>
     </mat-card>
+  </div>
+
+  <div class="pagination-box" *ngIf="!loading && totalPaginas > 1">
+    <button mat-stroked-button type="button" (click)="irParaPaginaAnterior()" [disabled]="paginaAtual === 0">
+      Anterior
+    </button>
+    <span>Página {{ paginaAtual + 1 }} de {{ totalPaginas }}</span>
+    <button mat-stroked-button color="primary" type="button" (click)="irParaProximaPagina()" [disabled]="paginaAtual >= totalPaginas - 1">
+      Próxima
+    </button>
   </div>
 
   <div class="status-box empty" *ngIf="!loading && !cards.length">

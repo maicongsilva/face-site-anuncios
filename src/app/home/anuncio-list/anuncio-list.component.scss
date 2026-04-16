@@ -54,7 +54,8 @@
   font-size: 13px;
 }
 
-.filter-field input {
+.filter-field input,
+.filter-field select {
   width: 100%;
   padding: 11px 12px;
   border-radius: 10px;
@@ -62,6 +63,10 @@
   background: #fff;
   font: inherit;
   color: #0f172a;
+}
+
+.sort-field {
+  min-width: 180px;
 }
 
 .filter-actions {
@@ -86,6 +91,20 @@
 .status-box.empty {
   background: #f8fafc;
   color: #475569;
+}
+
+.pagination-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.pagination-box span {
+  color: #334155;
+  font-weight: 600;
 }
 
 .card-grid {

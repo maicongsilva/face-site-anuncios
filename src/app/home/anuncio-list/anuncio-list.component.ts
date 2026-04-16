@@ -18,6 +18,11 @@ export class AnuncioListComponent implements OnInit {
   filtroLocalizacao = '';
   filtroPrecoMin: number | null = null;
   filtroPrecoMax: number | null = null;
+  paginaAtual = 0;
+  totalPaginas = 0;
+  totalResultados = 0;
+  readonly pageSize = 6;
+  ordenacao = 'dataCriacao,desc';
 
   constructor(
     private anuncioService: AnuncioService,
@@ -30,6 +35,7 @@ export class AnuncioListComponent implements OnInit {
   }
 
   aplicarFiltros(): void {
+    this.paginaAtual = 0;
     this.carregarAnuncios();
   }
 
@@ -39,6 +45,32 @@ export class AnuncioListComponent implements OnInit {
     this.filtroLocalizacao = '';
     this.filtroPrecoMin = null;
     this.filtroPrecoMax = null;
+    this.ordenacao = 'dataCriacao,desc';
+    this.paginaAtual = 0;
+    this.carregarAnuncios();
+  }
+
+  alterarOrdenacao(event: Event): void {
+    this.ordenacao = (event.target as HTMLSelectElement).value;
+    this.paginaAtual = 0;
+    this.carregarAnuncios();
+  }
+
+  irParaPaginaAnterior(): void {
+    if (this.paginaAtual === 0) {
+      return;
+    }
+
+    this.paginaAtual -= 1;
+    this.carregarAnuncios();
+  }
+
+  irParaProximaPagina(): void {
+    if (this.paginaAtual >= this.totalPaginas - 1) {
+      return;
+    }
+
+    this.paginaAtual += 1;
     this.carregarAnuncios();
   }
 
@@ -78,19 +110,23 @@ export class AnuncioListComponent implements OnInit {
     this.loading = true;
     this.feedback = '';
 
+    const [sortBy, direction] = this.ordenacao.split(',');
+
     this.anuncioService.listarPublicos({
       termo: this.filtroTermo,
       categoria: this.filtroCategoria,
       localizacao: this.filtroLocalizacao,
       precoMin: this.filtroPrecoMin,
       precoMax: this.filtroPrecoMax
-    }).subscribe({
-      next: (anuncios) => {
-        this.cards = anuncios.map((anuncio) => ({
+    }, this.paginaAtual, this.pageSize, sortBy, direction).subscribe({
+      next: (response) => {
+        this.cards = response.content.map((anuncio) => ({
           ...anuncio,
           image: anuncio.imagemUrl || this.getImageByCategory(anuncio.categoria)
         }));
-        this.feedback = anuncios.length ? '' : 'Nenhum anúncio encontrado com os filtros informados.';
+        this.totalPaginas = response.totalPages;
+        this.totalResultados = response.totalElements;
+        this.feedback = response.totalElements ? '' : 'Nenhum anúncio encontrado com os filtros informados.';
         this.loading = false;
       },
       error: () => {

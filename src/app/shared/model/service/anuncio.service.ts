@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { Anuncio } from '../anuncio.model';
+import { Anuncio, AnuncioPage } from '../anuncio.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,14 +12,24 @@ export class AnuncioService {
 
   constructor(private http: HttpClient) {}
 
-  listarPublicos(filters?: {
-    termo?: string;
-    categoria?: string;
-    localizacao?: string;
-    precoMin?: number | null;
-    precoMax?: number | null;
-  }): Observable<Anuncio[]> {
-    let params = new HttpParams();
+  listarPublicos(
+    filters?: {
+      termo?: string;
+      categoria?: string;
+      localizacao?: string;
+      precoMin?: number | null;
+      precoMax?: number | null;
+    },
+    page = 0,
+    size = 9,
+    sortBy = 'dataCriacao',
+    direction = 'desc'
+  ): Observable<AnuncioPage> {
+    let params = new HttpParams()
+      .set('page', String(page))
+      .set('size', String(size))
+      .set('sortBy', sortBy)
+      .set('direction', direction);
 
     if (filters?.termo?.trim()) {
       params = params.set('termo', filters.termo.trim());
@@ -41,8 +51,11 @@ export class AnuncioService {
       params = params.set('precoMax', String(filters.precoMax));
     }
 
-    return this.http.get<Anuncio[]>(this.apiUrl, { params }).pipe(
-      map((anuncios) => anuncios.map((anuncio) => this.normalizeAnuncio(anuncio)))
+    return this.http.get<AnuncioPage>(this.apiUrl, { params }).pipe(
+      map((pageResponse) => ({
+        ...pageResponse,
+        content: pageResponse.content.map((anuncio) => this.normalizeAnuncio(anuncio))
+      }))
     );
   }
 

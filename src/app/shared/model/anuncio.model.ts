@@ -14,3 +14,14 @@ export interface Anuncio {
   anuncianteTelefone?: string;
   anuncianteEmail?: string;
 }
+
+export interface AnuncioPage {
+  content: Anuncio[];
+  totalPages: number;
+  totalElements: number;
+  number: number;
+  size: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+}
