@@ -5,6 +5,10 @@
 }
 
 .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
   margin-bottom: 20px;
 }
 
@@ -19,6 +23,15 @@
   color: #475569;
 }
 
+.market-badge {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .filters-box {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -26,7 +39,8 @@
   margin-bottom: 20px;
   padding: 18px;
   border-radius: 16px;
-  background: #f8fafc;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
 }
 
 .filter-field {
@@ -60,9 +74,18 @@
 .status-box {
   padding: 16px 18px;
   border-radius: 14px;
+  margin-bottom: 20px;
+}
+
+.status-box.loading,
+.status-box.info {
+  background: #eff6ff;
+  color: #1e3a8a;
+}
+
+.status-box.empty {
   background: #f8fafc;
   color: #475569;
-  margin-bottom: 20px;
 }
 
 .card-grid {
@@ -75,6 +98,16 @@
   border-radius: 18px;
   overflow: hidden;
   box-shadow: 0 18px 40px rgba(15, 23, 42, 0.1);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.showcase-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 48px rgba(15, 23, 42, 0.14);
+}
+
+.image-wrap {
+  position: relative;
 }
 
 .showcase-card img {
@@ -89,6 +122,7 @@
 
 .showcase-card p {
   color: #475569;
+  min-height: 48px;
 }
 
 .meta-line {
@@ -99,19 +133,40 @@
   color: #0f172a;
 }
 
+.seller-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
 .favorite-count {
-  display: block;
-  margin-top: 8px;
   color: #be185d;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .tag {
+  position: absolute;
+  left: 12px;
+  top: 12px;
   display: inline-block;
   padding: 4px 10px;
   border-radius: 999px;
-  background: #dbeafe;
+  background: rgba(219, 234, 254, 0.95);
   color: #1d4ed8;
   font-size: 12px;
   font-weight: 700;
+}
+
+@media (max-width: 700px) {
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .seller-line,
+  .meta-line {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

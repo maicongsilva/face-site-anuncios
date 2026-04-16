@@ -1,7 +1,10 @@
 <section class="showcase-section">
   <div class="section-header">
-    <h2>Anúncios em destaque</h2>
-    <p>Agora a vitrine está ligada ao backend real da aplicação.</p>
+    <div>
+      <h2>Anúncios em destaque</h2>
+      <p>Explore ofertas reais publicadas pelos usuários da plataforma.</p>
+    </div>
+    <div class="market-badge">{{ cards.length }} resultado(s)</div>
   </div>
 
   <div class="filters-box">
@@ -36,19 +39,21 @@
     </div>
   </div>
 
-  <div class="status-box" *ngIf="loading">
+  <div class="status-box loading" *ngIf="loading">
     Carregando anúncios...
   </div>
 
-  <div class="status-box" *ngIf="feedback && !loading">
+  <div class="status-box info" *ngIf="feedback && !loading">
     {{ feedback }}
   </div>
 
   <div class="card-grid" *ngIf="!loading && cards.length">
     <mat-card class="showcase-card" *ngFor="let card of cards">
-      <img mat-card-image [src]="card.image" [alt]="card.titulo">
-      <mat-card-content>
+      <div class="image-wrap">
+        <img mat-card-image [src]="card.image" [alt]="card.titulo">
         <span class="tag">{{ card.categoria }}</span>
+      </div>
+      <mat-card-content>
         <h3>{{ card.titulo }}</h3>
         <p>{{ card.descricao }}</p>
 
@@ -57,19 +62,21 @@
           <span>{{ card.localizacao }}</span>
         </div>
 
-        <small>Anunciante: {{ card.anuncianteNome }}</small>
-        <small class="favorite-count">❤️ {{ card.totalFavoritos || 0 }} favorito(s)</small>
+        <div class="seller-line">
+          <small>Anunciante: {{ card.anuncianteNome }}</small>
+          <small class="favorite-count">❤️ {{ card.totalFavoritos || 0 }}</small>
+        </div>
       </mat-card-content>
       <mat-card-actions>
-        <a mat-button color="primary" [routerLink]="['/anuncios', card.id]">Detalhes</a>
-        <button mat-button color="accent" type="button" (click)="toggleFavorito(card)">
+        <a mat-flat-button color="primary" [routerLink]="['/anuncios', card.id]">Detalhes</a>
+        <button mat-stroked-button color="accent" type="button" (click)="toggleFavorito(card)">
           {{ card.favoritado ? 'Desfavoritar' : 'Favoritar' }}
         </button>
       </mat-card-actions>
     </mat-card>
   </div>
 
-  <div class="status-box" *ngIf="!loading && !cards.length">
+  <div class="status-box empty" *ngIf="!loading && !cards.length">
     Nenhum anúncio disponível no momento.
   </div>
 </section>

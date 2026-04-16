@@ -9,10 +9,41 @@
 }
 
 .hero-copy {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 20px;
   padding: 32px;
   border-radius: 24px;
   background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
   box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+}
+
+.hero-text {
+  display: grid;
+  align-content: center;
+}
+
+.hero-highlights {
+  display: grid;
+  gap: 12px;
+}
+
+.highlight-card {
+  display: grid;
+  gap: 6px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #dbeafe;
+  color: #334155;
+}
+
+.highlight-card strong {
+  color: #0f172a;
+}
+
+.highlight-card span {
+  font-size: 14px;
 }
 
 .hero-badge {
@@ -65,4 +96,10 @@
 .hero-link.secondary {
   background: #e2e8f0;
   color: #0f172a;
+}
+
+@media (max-width: 900px) {
+  .hero-copy {
+    grid-template-columns: 1fr;
+  }
 }
