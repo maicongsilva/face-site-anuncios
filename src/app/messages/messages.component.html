@@ -1,0 +1,37 @@
+<section class="messages-page">
+  <div class="messages-shell">
+    <mat-card class="messages-card">
+      <mat-card-content>
+        <div class="messages-header">
+          <div>
+            <span class="messages-badge">Mensagens</span>
+            <h2>Suas conversas</h2>
+            <p>Acompanhe contatos de compradores e anunciantes em um só lugar.</p>
+          </div>
+        </div>
+
+        <div class="conversation-list" *ngIf="!loading && conversas.length; else emptyState">
+          <div class="conversation-item" *ngFor="let conversa of conversas">
+            <div>
+              <strong>{{ conversa.anuncioTitulo }}</strong>
+              <p>{{ conversa.ultimoConteudo }}</p>
+              <small>Contato: {{ conversa.outroUsuarioNome }}</small>
+            </div>
+
+            <div class="conversation-meta">
+              <span *ngIf="conversa.naoLidas" class="status-pill">{{ conversa.naoLidas }} nova(s)</span>
+              <span>{{ conversa.dataUltimaMensagem | date:'short' }}</span>
+              <a mat-stroked-button color="primary" [routerLink]="['/chat', conversa.anuncioId]" [queryParams]="{ usuario: conversa.outroUsuarioId }">
+                Abrir conversa
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #emptyState>
+          <div class="empty-box">{{ loading ? 'Carregando mensagens...' : 'Você ainda não possui conversas.' }}</div>
+        </ng-template>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

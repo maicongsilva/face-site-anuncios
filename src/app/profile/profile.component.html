@@ -1,183 +1,240 @@
-<div class="profile-page" *ngIf="currentUser$ | async as user">
-  <div class="profile-shell">
-    <mat-card class="profile-card">
-      <mat-card-content>
-        <div class="profile-header">
-          <div>
-            <span class="profile-badge">Minha conta</span>
-            <h2>{{ user.nome }}</h2>
-            <p>Seus dados e seus anúncios estão integrados com o backend real.</p>
-          </div>
-        </div>
+<div class="profile-page">
+  <div class="profile-shell" *ngIf="currentUser$ | async as user; else profileSkeleton">
+    <mat-tab-group animationDuration="200ms" class="profile-tabs">
 
-        <div class="profile-grid">
-          <div class="profile-item">
-            <strong>Email</strong>
-            <span>{{ user.email }}</span>
-          </div>
-          <div class="profile-item">
-            <strong>Documento</strong>
-            <span>{{ user.documento || 'Não informado' }}</span>
-          </div>
-          <div class="profile-item">
-            <strong>Telefone</strong>
-            <span>{{ user.telefone || 'Não informado' }}</span>
-          </div>
-          <div class="profile-item">
-            <strong>Perfil</strong>
-            <span>{{ user.role || 'USER' }}</span>
-          </div>
-        </div>
-
-        <form [formGroup]="profileForm" class="profile-form" (ngSubmit)="salvarPerfil()">
-          <mat-form-field appearance="outline">
-            <mat-label>Nome</mat-label>
-            <input matInput formControlName="nome">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Documento</mat-label>
-            <input matInput formControlName="documento">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Telefone</mat-label>
-            <input matInput formControlName="telefone">
-          </mat-form-field>
-
-          <div class="profile-actions">
-            <button mat-raised-button color="primary" type="submit" [disabled]="updatingProfile">
-              {{ updatingProfile ? 'Salvando perfil...' : 'Salvar perfil' }}
-            </button>
-          </div>
-        </form>
-
-        <p class="feedback" *ngIf="profileFeedback">{{ profileFeedback }}</p>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="profile-card publish-card">
-      <mat-card-content>
-        <h3>{{ editingId ? 'Editar anúncio' : 'Publicar novo anúncio' }}</h3>
-
-        <form [formGroup]="anuncioForm" class="publish-form" (ngSubmit)="publicarAnuncio()">
-          <mat-form-field appearance="outline">
-            <mat-label>Título</mat-label>
-            <input matInput formControlName="titulo">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Categoria</mat-label>
-            <input matInput formControlName="categoria">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Localização</mat-label>
-            <input matInput formControlName="localizacao">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Preço</mat-label>
-            <input matInput type="number" formControlName="preco">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Descrição</mat-label>
-            <textarea matInput rows="4" formControlName="descricao"></textarea>
-          </mat-form-field>
-
-          <div class="full-width upload-box">
-            <label for="anuncio-image"><strong>Fotos do anúncio</strong></label>
-            <input id="anuncio-image" type="file" accept="image/*" multiple (change)="onImageSelected($event)">
-            <small>Selecione até 6 imagens para criar uma galeria mais atrativa.</small>
-
-            <div class="preview-gallery" *ngIf="previewImages.length">
-              <img
-                *ngFor="let image of previewImages; let first = first"
-                [src]="image"
-                alt="Prévia da imagem"
-                class="preview-thumb"
-                [class.primary-thumb]="first">
-            </div>
-          </div>
-
-          <div class="form-actions">
-            <button mat-raised-button color="primary" type="submit" [disabled]="submitting">
-              {{ submitting ? 'Salvando...' : (editingId ? 'Salvar alterações' : 'Publicar anúncio') }}
-            </button>
-            <button *ngIf="editingId" mat-stroked-button type="button" (click)="cancelarEdicao()">
-              Cancelar
-            </button>
-          </div>
-        </form>
-
-        <p class="feedback" *ngIf="feedback">{{ feedback }}</p>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="profile-card publish-card">
-      <mat-card-content>
-        <h3>Meus favoritos</h3>
-
-        <div class="my-ad-list" *ngIf="meusFavoritos.length; else emptyFavorites">
-          <div class="ad-item" *ngFor="let anuncio of meusFavoritos">
-            <img *ngIf="anuncio.imagemUrl" [src]="anuncio.imagemUrl" [alt]="anuncio.titulo" class="ad-thumb">
-
-            <div class="ad-content">
-              <strong>{{ anuncio.titulo }}</strong>
-              <p>{{ anuncio.descricao }}</p>
-              <small class="ad-note">Anunciante: {{ anuncio.anuncianteNome || 'Não informado' }}</small>
-            </div>
-
-            <div class="ad-meta">
-              <span>{{ anuncio.categoria }}</span>
-              <span>{{ anuncio.localizacao }}</span>
-              <strong>{{ anuncio.preco | currency:'BRL':'symbol':'1.2-2' }}</strong>
-
-              <div class="ad-actions">
-                <a mat-button color="primary" [routerLink]="['/anuncios', anuncio.id]">Detalhes</a>
-                <button mat-button color="warn" type="button" (click)="removerFavorito(anuncio)">Remover</button>
+      <!-- Tab: Perfil -->
+      <mat-tab label="Perfil">
+        <mat-card class="profile-card tab-content">
+          <mat-card-content>
+            <div class="profile-header">
+              <div>
+                <span class="profile-badge">Minha conta</span>
+                <h2>{{ user.nome }}</h2>
+                <p>Seus dados e seus anúncios estão integrados com o backend real.</p>
               </div>
             </div>
-          </div>
-        </div>
 
-        <ng-template #emptyFavorites>
-          <p class="feedback">Você ainda não favoritou anúncios.</p>
-        </ng-template>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="profile-card publish-card">
-      <mat-card-content>
-        <h3>Meus anúncios</h3>
-
-        <div class="my-ad-list" *ngIf="meusAnuncios.length; else emptyState">
-          <div class="ad-item" *ngFor="let anuncio of meusAnuncios">
-            <img *ngIf="anuncio.imagemUrl" [src]="anuncio.imagemUrl" [alt]="anuncio.titulo" class="ad-thumb">
-
-            <div class="ad-content">
-              <strong>{{ anuncio.titulo }}</strong>
-              <p>{{ anuncio.descricao }}</p>
-            </div>
-
-            <div class="ad-meta">
-              <span>{{ anuncio.categoria }}</span>
-              <span>{{ anuncio.localizacao }}</span>
-              <strong>{{ anuncio.preco | currency:'BRL':'symbol':'1.2-2' }}</strong>
-
-              <div class="ad-actions">
-                <button mat-button color="primary" type="button" (click)="editarAnuncio(anuncio)">Editar</button>
-                <button mat-button color="warn" type="button" (click)="excluirAnuncio(anuncio)">Excluir</button>
+            <div class="profile-grid">
+              <div class="profile-item">
+                <strong>Email</strong>
+                <span>{{ user.email }}</span>
+              </div>
+              <div class="profile-item">
+                <strong>Documento</strong>
+                <span>{{ user.documento || 'Não informado' }}</span>
+              </div>
+              <div class="profile-item">
+                <strong>Telefone</strong>
+                <span>{{ user.telefone || 'Não informado' }}</span>
+              </div>
+              <div class="profile-item">
+                <strong>Perfil</strong>
+                <span>{{ user.role || 'USER' }}</span>
               </div>
             </div>
-          </div>
-        </div>
 
-        <ng-template #emptyState>
-          <p class="feedback">Você ainda não publicou anúncios.</p>
-        </ng-template>
-      </mat-card-content>
-    </mat-card>
+            <form [formGroup]="profileForm" class="profile-form" (ngSubmit)="salvarPerfil()">
+              <mat-form-field appearance="outline">
+                <mat-label>Nome</mat-label>
+                <input matInput formControlName="nome">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Documento</mat-label>
+                <input matInput formControlName="documento">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Telefone</mat-label>
+                <input matInput formControlName="telefone">
+              </mat-form-field>
+
+              <div class="profile-actions">
+                <button mat-raised-button color="primary" type="submit" [disabled]="updatingProfile">
+                  {{ updatingProfile ? 'Salvando perfil...' : 'Salvar perfil' }}
+                </button>
+              </div>
+            </form>
+
+            <p class="feedback" *ngIf="profileFeedback">{{ profileFeedback }}</p>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+
+      <!-- Tab: Publicar Anúncio -->
+      <mat-tab label="Publicar Anúncio">
+        <mat-card class="profile-card tab-content">
+          <mat-card-content>
+            <h3>{{ editingId ? 'Editar anúncio' : 'Publicar novo anúncio' }}</h3>
+
+            <form [formGroup]="anuncioForm" class="publish-form" (ngSubmit)="publicarAnuncio()">
+              <mat-form-field appearance="outline">
+                <mat-label>Título</mat-label>
+                <input matInput formControlName="titulo">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Categoria</mat-label>
+                <input matInput formControlName="categoria">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Localização</mat-label>
+                <input matInput formControlName="localizacao">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Preço</mat-label>
+                <input matInput type="number" formControlName="preco">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Descrição</mat-label>
+                <textarea matInput rows="4" formControlName="descricao"></textarea>
+              </mat-form-field>
+
+              <div class="full-width upload-box">
+                <label for="anuncio-image"><strong>Fotos do anúncio</strong></label>
+                <input id="anuncio-image" type="file" accept="image/*" multiple (change)="onImageSelected($event)">
+                <small>Selecione até 6 imagens para criar uma galeria mais atrativa.</small>
+
+                <div class="preview-gallery" *ngIf="previewImages.length">
+                  <img
+                    *ngFor="let image of previewImages; let first = first"
+                    [src]="image"
+                    alt="Prévia da imagem"
+                    class="preview-thumb"
+                    [class.primary-thumb]="first">
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button mat-raised-button color="primary" type="submit" [disabled]="submitting">
+                  {{ submitting ? 'Salvando...' : (editingId ? 'Salvar alterações' : 'Publicar anúncio') }}
+                </button>
+                <button *ngIf="editingId" mat-stroked-button type="button" (click)="cancelarEdicao()">
+                  Cancelar
+                </button>
+              </div>
+            </form>
+
+            <p class="feedback" *ngIf="feedback">{{ feedback }}</p>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+
+      <!-- Tab: Conversas -->
+      <mat-tab label="Conversas">
+        <mat-card class="profile-card tab-content" id="conversas">
+          <mat-card-content>
+            <h3>Minhas conversas</h3>
+
+            <div class="my-ad-list" *ngIf="minhasConversas.length; else emptyChats">
+              <div class="ad-item conversation-item" *ngFor="let conversa of minhasConversas">
+                <div class="ad-content">
+                  <strong>{{ conversa.anuncioTitulo }}</strong>
+                  <p>{{ conversa.ultimoConteudo }}</p>
+                  <small class="ad-note">Contato: {{ conversa.outroUsuarioNome }}</small>
+                </div>
+
+                <div class="ad-meta">
+                  <span *ngIf="conversa.naoLidas" class="status-pill">{{ conversa.naoLidas }} nova(s)</span>
+                  <span>{{ conversa.dataUltimaMensagem | date:'short' }}</span>
+
+                  <div class="ad-actions">
+                    <a mat-button color="primary" [routerLink]="['/chat', conversa.anuncioId]" [queryParams]="{ usuario: conversa.outroUsuarioId }">Abrir conversa</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <ng-template #emptyChats>
+              <p class="feedback">Você ainda não possui conversas.</p>
+            </ng-template>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+
+      <!-- Tab: Favoritos -->
+      <mat-tab label="Favoritos">
+        <mat-card class="profile-card tab-content">
+          <mat-card-content>
+            <h3>Meus favoritos</h3>
+
+            <div class="my-ad-list" *ngIf="meusFavoritos.length; else emptyFavorites">
+              <div class="ad-item" *ngFor="let anuncio of meusFavoritos">
+                <img *ngIf="anuncio.imagemUrl" [src]="anuncio.imagemUrl" [alt]="anuncio.titulo" class="ad-thumb">
+
+                <div class="ad-content">
+                  <strong>{{ anuncio.titulo }}</strong>
+                  <p>{{ anuncio.descricao }}</p>
+                  <small class="ad-note">Anunciante: {{ anuncio.anuncianteNome || 'Não informado' }}</small>
+                </div>
+
+                <div class="ad-meta">
+                  <span>{{ anuncio.categoria }}</span>
+                  <span>{{ anuncio.localizacao }}</span>
+                  <strong>{{ anuncio.preco | currency:'BRL':'symbol':'1.2-2' }}</strong>
+
+                  <div class="ad-actions">
+                    <a mat-button color="primary" [routerLink]="['/anuncios', anuncio.id]">Detalhes</a>
+                    <button mat-button color="warn" type="button" (click)="removerFavorito(anuncio)">Remover</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <ng-template #emptyFavorites>
+              <p class="feedback">Você ainda não favoritou anúncios.</p>
+            </ng-template>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+
+      <!-- Tab: Meus Anúncios -->
+      <mat-tab label="Meus Anúncios">
+        <mat-card class="profile-card tab-content">
+          <mat-card-content>
+            <h3>Meus anúncios</h3>
+
+            <div class="my-ad-list" *ngIf="meusAnuncios.length; else emptyState">
+              <div class="ad-item" *ngFor="let anuncio of meusAnuncios">
+                <img *ngIf="anuncio.imagemUrl" [src]="anuncio.imagemUrl" [alt]="anuncio.titulo" class="ad-thumb">
+
+                <div class="ad-content">
+                  <strong>{{ anuncio.titulo }}</strong>
+                  <p>{{ anuncio.descricao }}</p>
+                </div>
+
+                <div class="ad-meta">
+                  <span>{{ anuncio.categoria }}</span>
+                  <span>{{ anuncio.localizacao }}</span>
+                  <strong>{{ anuncio.preco | currency:'BRL':'symbol':'1.2-2' }}</strong>
+
+                  <div class="ad-actions">
+                    <button mat-button color="primary" type="button" (click)="editarAnuncio(anuncio)">Editar</button>
+                    <button mat-button color="warn" type="button" (click)="excluirAnuncio(anuncio)">Excluir</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <ng-template #emptyState>
+              <p class="feedback">Você ainda não publicou anúncios.</p>
+            </ng-template>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+
+    </mat-tab-group>
   </div>
+
+  <ng-template #profileSkeleton>
+    <div class="profile-shell">
+      <div class="profile-skeleton">
+        <div class="skel-tab-bar shimmer"></div>
+        <div class="skel-card shimmer"></div>
+      </div>
+    </div>
+  </ng-template>
 </div>

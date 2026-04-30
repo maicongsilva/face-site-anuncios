@@ -4,6 +4,7 @@ import { ErrorStateMatcher } from '@angular/material/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../shared/model/service/auth.service';
 import { NovoUsuario } from './novo-usuario';
+import { getErrorMessage } from '../shared/utils/error.utils';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -20,6 +21,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 export class RegisterComponent implements OnInit {
   matcher = new MyErrorStateMatcher();
   hide = true;
+  loading = false;
   successmessage: string | null = null;
   errormessage: string | null = null;
 
@@ -49,14 +51,17 @@ export class RegisterComponent implements OnInit {
     const formData = this.registerForm.getRawValue() as NovoUsuario;
     this.successmessage = null;
     this.errormessage = null;
+    this.loading = true;
 
     this.authService.register(formData).subscribe({
       next: () => {
+        this.loading = false;
         this.successmessage = 'Cadastro realizado com sucesso.';
         this.router.navigate(['/minha-conta']);
       },
       error: (error) => {
-        this.errormessage = error?.error?.message || error?.error || 'Não foi possível realizar o cadastro.';
+        this.loading = false;
+        this.errormessage = getErrorMessage(error, 'register');
       }
     });
   }

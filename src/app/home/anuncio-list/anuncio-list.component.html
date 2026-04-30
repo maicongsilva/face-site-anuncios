@@ -43,6 +43,7 @@
     <label class="filter-field">
       <span>Preço máximo</span>
       <input type="number" [value]="filtroPrecoMax ?? ''" (input)="atualizarCampoNumero('filtroPrecoMax', $event)">
+      <small class="price-error" *ngIf="precoInvalido">Máximo deve ser maior que o mínimo</small>
     </label>
 
     <label class="filter-field sort-field">
@@ -56,13 +57,20 @@
     </label>
 
     <div class="filter-actions">
-      <button mat-raised-button color="primary" type="button" (click)="aplicarFiltros()">Filtrar</button>
+      <button mat-raised-button color="primary" type="button" (click)="aplicarFiltros()" [disabled]="precoInvalido">Filtrar</button>
       <button mat-stroked-button type="button" (click)="limparFiltros()">Limpar</button>
     </div>
   </div>
 
-  <div class="status-box loading" *ngIf="loading">
-    Carregando anúncios...
+  <div class="card-grid" *ngIf="loading">
+    <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]">
+      <div class="skeleton-img shimmer"></div>
+      <div class="skeleton-body">
+        <div class="skeleton-line w80 shimmer"></div>
+        <div class="skeleton-line w60 shimmer"></div>
+        <div class="skeleton-line w40 shimmer"></div>
+      </div>
+    </div>
   </div>
 
   <div class="status-box info" *ngIf="feedback && !loading">
@@ -76,49 +84,66 @@
         <span class="tag">{{ card.categoria }}</span>
         <span class="new-badge" *ngIf="card.isNovo">Novo</span>
       </div>
-      <mat-card-content>
+      <mat-card-content class="card-body">
         <h3>{{ card.titulo }}</h3>
-        <p>{{ card.descricao }}</p>
+        <p class="card-desc">{{ card.descricao }}</p>
 
         <div class="meta-line">
           <strong>{{ card.preco | currency:'BRL':'symbol':'1.2-2' }}</strong>
-          <span>{{ card.localizacao }}</span>
+          <span class="location-line"><mat-icon class="inline-icon">place</mat-icon>{{ card.localizacao }}</span>
         </div>
 
         <div class="seller-line">
-          <small>Anunciante: {{ card.anuncianteNome }}</small>
-          <small class="favorite-count">❤️ {{ card.totalFavoritos || 0 }}</small>
+          <small>{{ card.anuncianteNome }}</small>
+          <small class="favorite-count">
+            <mat-icon class="heart-icon" [class.hearted]="card.favoritado">{{ card.favoritado ? 'favorite' : 'favorite_border' }}</mat-icon>
+            {{ card.totalFavoritos || 0 }}
+          </small>
         </div>
-
-        <small class="publish-hint" *ngIf="card.isNovo">Publicado recentemente</small>
       </mat-card-content>
-      <mat-card-actions>
+      <mat-card-actions class="card-actions">
         <a mat-flat-button color="primary" [routerLink]="['/anuncios', card.id]">Detalhes</a>
-        <button mat-stroked-button color="accent" type="button" (click)="toggleFavorito(card)">
-          {{ card.favoritado ? 'Desfavoritar' : 'Favoritar' }}
+        <button mat-icon-button class="fav-btn" [class.fav-active]="card.favoritado" type="button" (click)="toggleFavorito(card)" [attr.aria-label]="card.favoritado ? 'Desfavoritar' : 'Favoritar'">
+          <mat-icon>{{ card.favoritado ? 'favorite' : 'favorite_border' }}</mat-icon>
         </button>
       </mat-card-actions>
     </mat-card>
   </div>
 
   <div class="pagination-box" *ngIf="!loading && totalPaginas > 1">
-    <button mat-stroked-button type="button" (click)="irParaPaginaAnterior()" [disabled]="paginaAtual === 0">
-      Anterior
+    <button mat-icon-button type="button" (click)="irParaPaginaAnterior()" [disabled]="paginaAtual === 0" aria-label="Página anterior">
+      <mat-icon>chevron_left</mat-icon>
     </button>
-    <span>Página {{ paginaAtual + 1 }} de {{ totalPaginas }}</span>
-    <button mat-stroked-button color="primary" type="button" (click)="irParaProximaPagina()" [disabled]="paginaAtual >= totalPaginas - 1">
-      Próxima
+
+    <ng-container *ngFor="let p of pageButtons">
+      <span *ngIf="p === '...'" class="page-ellipsis">…</span>
+      <button
+        *ngIf="p !== '...'"
+        class="page-btn"
+        [class.page-active]="p === paginaAtual"
+        type="button"
+        (click)="irParaPagina(+p)">
+        {{ +p + 1 }}
+      </button>
+    </ng-container>
+
+    <button mat-icon-button type="button" (click)="irParaProximaPagina()" [disabled]="paginaAtual >= totalPaginas - 1" aria-label="Próxima página">
+      <mat-icon>chevron_right</mat-icon>
     </button>
-    <button mat-flat-button color="accent" type="button" (click)="voltarAoTopo()">
-      Voltar ao topo
+
+    <button mat-icon-button type="button" (click)="voltarAoTopo()" aria-label="Voltar ao topo">
+      <mat-icon>keyboard_arrow_up</mat-icon>
     </button>
   </div>
 
   <div class="status-box empty empty-state" *ngIf="!loading && !cards.length">
     <div class="empty-icon">🔎</div>
     <h3>Nenhum anúncio encontrado</h3>
-    <p>Tente ajustar os filtros ou limpar a busca para ver mais resultados.</p>
-    <button mat-flat-button color="primary" type="button" (click)="limparFiltros()">
+    <p>Tente ajustar os filtros ou explore uma dessas categorias:</p>
+    <div class="empty-suggestions">
+      <button mat-stroked-button *ngFor="let c of categoriasRapidas" type="button" (click)="aplicarCategoriaRapida(c)">{{ c }}</button>
+    </div>
+    <button mat-flat-button color="primary" type="button" (click)="limparFiltros()" style="margin-top: 12px">
       Limpar filtros
     </button>
   </div>

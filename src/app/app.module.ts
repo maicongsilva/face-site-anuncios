@@ -17,10 +17,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTabsModule } from '@angular/material/tabs';
 import { ProfileComponent } from './profile/profile.component';
 import { AnuncioDetailComponent } from './anuncio-detail/anuncio-detail.component';
 import { AuthInterceptor } from './shared/interceptors/auth.interceptor';
 import { AdminComponent } from './admin/admin.component';
+import { ChatComponent } from './chat/chat.component';
+import { MessagesComponent } from './messages/messages.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +33,9 @@ import { AdminComponent } from './admin/admin.component';
     RegisterComponent,
     ProfileComponent,
     AnuncioDetailComponent,
-    AdminComponent
+    AdminComponent,
+    ChatComponent,
+    MessagesComponent
   ],
   providers: [
     {
@@ -54,7 +61,10 @@ import { AdminComponent } from './admin/admin.component';
     MatIconModule,
     MatButtonToggleModule,
     MatFormFieldModule,
-    MatCardModule
+    MatCardModule,
+    MatBadgeModule,
+    MatSnackBarModule,
+    MatTabsModule
   ]
 })
 export class AppModule { }

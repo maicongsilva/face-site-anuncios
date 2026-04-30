@@ -66,6 +66,10 @@
   border-radius: 999px;
 }
 
+.unread-btn {
+  overflow: visible;
+}
+
 .action-btn.primary {
   background: #ffffff !important;
   color: #1d4ed8 !important;
@@ -91,21 +95,101 @@
   min-height: calc(100vh - 64px);
 }
 
+/* ── Hamburger / Mobile menu ─────────────────────────────── */
+.hamburger-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 4px;
+  margin-left: 8px;
+  border-radius: 8px;
+  transition: background 0.15s;
+  line-height: 1;
+}
+
+.hamburger-btn:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
+  padding: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.2s ease;
+}
+
+.mobile-menu.open {
+  max-height: 400px;
+  padding: 8px 12px 14px;
+}
+
+.mobile-menu a,
+.mobile-menu button {
+  color: #fff !important;
+  text-align: left;
+  padding: 10px 8px;
+  font-size: 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  width: 100%;
+}
+
+.mobile-user {
+  display: block;
+  color: rgba(255,255,255,0.75);
+  font-size: 13px;
+  padding: 8px 8px 4px;
+}
+
+.badge-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ef4444;
+  color: #fff;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.mobile-logout {
+  color: #fca5a5 !important;
+}
+
 @media (max-width: 900px) {
   .toolbar-content {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     height: auto;
-    padding: 12px 0;
+    padding: 8px 0;
+  }
+
+  .toolbar-search {
+    display: none;
   }
 
   .toolbar-actions {
-    width: 100%;
-    justify-content: flex-end;
-    flex-wrap: wrap;
+    display: none;
+  }
+
+  .hamburger-btn {
+    display: flex;
+    align-items: center;
+  }
+
+  .mobile-menu {
+    display: flex;
   }
 
   .brand-subtitle {
     display: none;
   }
 }
+
 

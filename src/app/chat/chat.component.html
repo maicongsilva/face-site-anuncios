@@ -1,0 +1,46 @@
+<section class="chat-page">
+  <div class="chat-shell">
+    <mat-card class="chat-card">
+      <mat-card-content>
+        <h2>Conversa do anúncio</h2>
+        <p class="chat-subtitle">Fale com segurança com o anunciante.</p>
+
+        <ng-template #loadingState>
+          <div class="chat-skeleton">
+            <div class="skel-bubble skel-left shimmer"></div>
+            <div class="skel-bubble skel-right shimmer"></div>
+            <div class="skel-bubble skel-left shimmer" style="width: 55%"></div>
+            <div class="skel-bubble skel-right shimmer" style="width: 45%"></div>
+          </div>
+        </ng-template>
+
+        <div class="chat-box" *ngIf="!loading; else loadingState">
+          <div class="chat-empty" *ngIf="!mensagens.length">Nenhuma mensagem ainda. Comece a conversa.</div>
+
+          <div class="message-list" *ngIf="mensagens.length">
+            <div class="message-group" *ngFor="let group of groupedMessages" [class.own-group]="group.minha">
+              <strong class="group-sender">{{ group.remetenteNome }}</strong>
+              <div class="message-item" *ngFor="let msg of group.mensagens">
+                <span class="msg-content">{{ msg.conteudo }}</span>
+                <time class="msg-time" *ngIf="msg.dataEnvio">{{ msg.dataEnvio | date:'HH:mm' }}</time>
+              </div>
+            </div>
+          </div>
+
+          <form [formGroup]="form" class="chat-form" (ngSubmit)="enviar()">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Sua mensagem</mat-label>
+              <textarea matInput rows="3" formControlName="conteudo"></textarea>
+            </mat-form-field>
+
+            <div class="chat-actions">
+              <button mat-raised-button color="primary" type="submit">Enviar</button>
+            </div>
+          </form>
+
+          <p class="chat-feedback" *ngIf="feedback">{{ feedback }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

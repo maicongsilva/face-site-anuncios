@@ -1,4 +1,12 @@
 <div class="pesquisa">
-    <input type="text" class="form-control" placeholder="Buscar" >
-    <button mat-button color="write">Pesquisar</button>
+  <input
+    type="text"
+    class="form-control"
+    placeholder="Buscar anúncios..."
+    [(ngModel)]="termo"
+    (keyup.enter)="pesquisar()"
+    aria-label="Buscar anúncios">
+  <button mat-icon-button type="button" (click)="pesquisar()" aria-label="Pesquisar">
+    <mat-icon>search</mat-icon>
+  </button>
 </div>

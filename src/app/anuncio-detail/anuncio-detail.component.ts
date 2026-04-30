@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Anuncio } from '../shared/model/anuncio.model';
 import { AnuncioService } from '../shared/model/service/anuncio.service';
 import { AuthService } from '../shared/model/service/auth.service';
@@ -15,12 +16,15 @@ export class AnuncioDetailComponent implements OnInit {
   loading = true;
   shareFeedback = '';
   selectedImageUrl: string | null = null;
+  lightboxOpen = false;
+  lightboxUrl = '';
 
   constructor(
     private route: ActivatedRoute,
     private anuncioService: AnuncioService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private snack: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -50,12 +54,27 @@ export class AnuncioDetailComponent implements OnInit {
       next: (anuncio) => {
         this.anuncio = anuncio;
         this.selectedImageUrl = anuncio.imagemUrl || anuncio.imagens?.[0] || null;
+        const msg = anuncio.favoritado ? 'Adicionado aos favoritos' : 'Removido dos favoritos';
+        this.snack.open(msg, '', { duration: 2500 });
+      },
+      error: () => {
+        this.snack.open('Não foi possível atualizar os favoritos', 'Fechar', { duration: 3000 });
       }
     });
   }
 
   selecionarImagem(url: string): void {
     this.selectedImageUrl = url;
+  }
+
+  openLightbox(url: string): void {
+    this.lightboxUrl = url;
+    this.lightboxOpen = true;
+  }
+
+  closeLightbox(): void {
+    this.lightboxOpen = false;
+    this.lightboxUrl = '';
   }
 
   get whatsappLink(): string | null {
@@ -79,43 +98,36 @@ export class AnuncioDetailComponent implements OnInit {
   }
 
   compartilharAnuncio(): void {
-    if (!this.anuncio) {
-      return;
-    }
-
+    if (!this.anuncio) return;
     const url = this.getCurrentUrl();
-
     if (navigator.share) {
       navigator.share({
         title: this.anuncio.titulo,
         text: `Olha esse anúncio: ${this.anuncio.titulo}`,
         url
       }).then(() => {
-        this.shareFeedback = 'Anúncio compartilhado com sucesso.';
+        this.snack.open('Anúncio compartilhado com sucesso!', '', { duration: 2500 });
       }).catch(() => {
         this.copyLink();
       });
       return;
     }
-
     this.copyLink();
   }
 
   copyLink(): void {
     const url = this.getCurrentUrl();
-
     if (navigator.clipboard?.writeText) {
       navigator.clipboard.writeText(url)
         .then(() => {
-          this.shareFeedback = 'Link copiado para a área de transferência.';
+          this.snack.open('Link copiado para a área de transferência!', '', { duration: 2500 });
         })
         .catch(() => {
-          this.shareFeedback = 'Não foi possível copiar o link agora.';
+          this.snack.open('Não foi possível copiar o link', 'Fechar', { duration: 3000 });
         });
       return;
     }
-
-    this.shareFeedback = 'Copie o link direto da barra do navegador.';
+    this.snack.open('Copie o link direto da barra do navegador', '', { duration: 3000 });
   }
 
   private carregarRelacionados(id: number): void {

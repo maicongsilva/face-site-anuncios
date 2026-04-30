@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Observable, of, switchMap } from 'rxjs';
+import { Observable, of, Subscription, switchMap } from 'rxjs';
 import { AuthService } from '../shared/model/service/auth.service';
 import { AuthUser } from '../shared/model/auth.model';
 import { Anuncio } from '../shared/model/anuncio.model';
+import { ChatThread } from '../shared/model/chat-thread.model';
 import { AnuncioService } from '../shared/model/service/anuncio.service';
+import { ChatService } from '../shared/model/service/chat.service';
 
 @Component({
   selector: 'app-profile',
@@ -15,6 +17,8 @@ export class ProfileComponent implements OnInit {
   currentUser$: Observable<AuthUser | null> = this.authService.currentUser$;
   meusAnuncios: Anuncio[] = [];
   meusFavoritos: Anuncio[] = [];
+  minhasConversas: ChatThread[] = [];
+  private unreadSubscription?: Subscription;
   submitting = false;
   updatingProfile = false;
   feedback = '';
@@ -43,6 +47,7 @@ export class ProfileComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private anuncioService: AnuncioService,
+    private chatService: ChatService,
     private fb: FormBuilder
   ) {}
 
@@ -56,9 +61,12 @@ export class ProfileComponent implements OnInit {
         });
         this.carregarMeusAnuncios();
         this.carregarFavoritos();
+        this.carregarConversas();
       },
       error: () => this.authService.logout()
     });
+
+    this.unreadSubscription = this.chatService.unreadRefresh$.subscribe(() => this.carregarConversas());
   }
 
   salvarPerfil(): void {
@@ -255,6 +263,13 @@ export class ProfileComponent implements OnInit {
     this.anuncioService.listarFavoritos().subscribe({
       next: (anuncios) => this.meusFavoritos = anuncios,
       error: () => this.meusFavoritos = []
+    });
+  }
+
+  private carregarConversas(): void {
+    this.chatService.listarConversas().subscribe({
+      next: (conversas) => this.minhasConversas = conversas,
+      error: () => this.minhasConversas = []
     });
   }
 }

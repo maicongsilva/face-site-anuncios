@@ -148,6 +148,22 @@
   align-items: start;
 }
 
+.conversation-item {
+  grid-template-columns: 1fr auto;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-weight: 700;
+  font-size: 12px;
+}
+
 .ad-thumb {
   width: 120px;
   height: 90px;
@@ -196,4 +212,30 @@
   .ad-actions {
     justify-content: flex-start;
   }
+}
+
+.profile-tabs {
+  .mat-tab-header { border-radius: 12px 12px 0 0; }
+}
+
+.tab-content {
+  border-radius: 0 0 16px 16px;
+  margin-top: 0;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.profile-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skel-tab-bar {
+  height: 48px;
+  border-radius: 8px;
+}
+
+.skel-card {
+  height: 320px;
+  border-radius: 16px;
 }

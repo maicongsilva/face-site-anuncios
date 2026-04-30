@@ -51,11 +51,8 @@ export class AnuncioService {
       params = params.set('precoMax', String(filters.precoMax));
     }
 
-    return this.http.get<AnuncioPage>(this.apiUrl, { params }).pipe(
-      map((pageResponse) => ({
-        ...pageResponse,
-        content: pageResponse.content.map((anuncio) => this.normalizeAnuncio(anuncio))
-      }))
+    return this.http.get<AnuncioPage | Anuncio[]>(this.apiUrl, { params }).pipe(
+      map((response) => this.normalizePageResponse(response, page, size))
     );
   }
 
@@ -122,6 +119,36 @@ export class AnuncioService {
 
   excluir(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  private normalizePageResponse(response: AnuncioPage | Anuncio[], page: number, size: number): AnuncioPage {
+    if (Array.isArray(response)) {
+      const anuncios = response.map((anuncio) => this.normalizeAnuncio(anuncio));
+      const totalElements = anuncios.length;
+
+      return {
+        content: anuncios,
+        totalPages: totalElements ? Math.ceil(totalElements / size) : 0,
+        totalElements,
+        number: page,
+        size,
+        first: page === 0,
+        last: true,
+        empty: totalElements === 0
+      };
+    }
+
+    return {
+      ...response,
+      content: (response.content || []).map((anuncio) => this.normalizeAnuncio(anuncio)),
+      totalPages: response.totalPages ?? 0,
+      totalElements: response.totalElements ?? 0,
+      number: response.number ?? page,
+      size: response.size ?? size,
+      first: response.first ?? page === 0,
+      last: response.last ?? true,
+      empty: response.empty ?? !(response.content?.length)
+    };
   }
 
   private normalizeAnuncio(anuncio: Anuncio): Anuncio {

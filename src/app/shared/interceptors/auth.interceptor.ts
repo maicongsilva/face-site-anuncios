@@ -3,9 +3,11 @@ import {
   HttpEvent,
   HttpHandler,
   HttpInterceptor,
-  HttpRequest
+  HttpRequest,
+  HttpErrorResponse
 } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from '../model/service/auth.service';
 
 @Injectable()
@@ -15,16 +17,25 @@ export class AuthInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const token = this.authService.getToken();
 
-    if (!token) {
-      return next.handle(req);
-    }
+    const authReq = token
+      ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+      : req;
 
-    const authReq = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    return next.handle(authReq);
+    return next.handle(authReq).pipe(
+      catchError((error: unknown) => {
+        // Normalize Angular dev-proxy string errors into a proper HttpErrorResponse
+        const httpErr = error as HttpErrorResponse;
+        if (typeof httpErr?.error === 'string' && httpErr.error.toLowerCase().includes('proxy')) {
+          const normalized = new HttpErrorResponse({
+            error: { message: httpErr.error },
+            status: 0,
+            statusText: 'Network Error',
+            url: req.url
+          });
+          return throwError(() => normalized);
+        }
+        return throwError(() => error);
+      })
+    );
   }
 }

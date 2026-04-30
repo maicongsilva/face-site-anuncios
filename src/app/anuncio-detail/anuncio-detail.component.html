@@ -4,8 +4,16 @@
   </div>
 
   <div class="detail-shell" *ngIf="!loading && anuncio as item; else notFound">
+    <nav class="breadcrumb" aria-label="Navegação">
+      <a routerLink="/">Início</a>
+      <span class="breadcrumb-sep">›</span>
+      <a [routerLink]="['/']" [queryParams]="{categoria: item.categoria}">{{ item.categoria }}</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>{{ item.titulo }}</span>
+    </nav>
+
     <mat-card class="detail-card">
-      <img *ngIf="selectedImageUrl || item.imagemUrl" [src]="selectedImageUrl || item.imagemUrl" [alt]="item.titulo" class="detail-image">
+      <img *ngIf="selectedImageUrl || item.imagemUrl" [src]="selectedImageUrl || item.imagemUrl" [alt]="item.titulo" class="detail-image clickable-image" (click)="openLightbox(selectedImageUrl || item.imagemUrl || '')">
 
       <div class="thumb-gallery" *ngIf="(item.imagens?.length || 0) > 1">
         <button
@@ -24,34 +32,53 @@
         <p class="detail-description">{{ item.descricao }}</p>
 
         <div class="detail-grid">
-          <div>
-            <strong>Preço</strong>
-            <span>{{ item.preco | currency:'BRL':'symbol':'1.2-2' }}</span>
+          <div class="detail-item">
+            <mat-icon class="field-icon">sell</mat-icon>
+            <div>
+              <strong>Preço</strong>
+              <span>{{ item.preco | currency:'BRL':'symbol':'1.2-2' }}</span>
+            </div>
           </div>
-          <div>
-            <strong>Localização</strong>
-            <span>{{ item.localizacao }}</span>
+          <div class="detail-item">
+            <mat-icon class="field-icon">location_on</mat-icon>
+            <div>
+              <strong>Localização</strong>
+              <span>{{ item.localizacao }}</span>
+            </div>
           </div>
-          <div>
-            <strong>Anunciante</strong>
-            <span>{{ item.anuncianteNome || 'Não informado' }}</span>
+          <div class="detail-item">
+            <mat-icon class="field-icon">person</mat-icon>
+            <div>
+              <strong>Anunciante</strong>
+              <span>{{ item.anuncianteNome || 'Não informado' }}</span>
+            </div>
           </div>
-          <div>
-            <strong>Telefone</strong>
-            <span>{{ item.anuncianteTelefone || 'Não informado' }}</span>
+          <div class="detail-item">
+            <mat-icon class="field-icon">phone</mat-icon>
+            <div>
+              <strong>Telefone</strong>
+              <span>{{ item.anuncianteTelefone || 'Não informado' }}</span>
+            </div>
           </div>
-          <div>
-            <strong>Email</strong>
-            <span>{{ item.anuncianteEmail || 'Não informado' }}</span>
+          <div class="detail-item">
+            <mat-icon class="field-icon">email</mat-icon>
+            <div>
+              <strong>Email</strong>
+              <span>{{ item.anuncianteEmail || 'Não informado' }}</span>
+            </div>
           </div>
-          <div>
-            <strong>Favoritos</strong>
-            <span>❤️ {{ item.totalFavoritos || 0 }}</span>
+          <div class="detail-item">
+            <mat-icon class="field-icon favorite-icon">favorite</mat-icon>
+            <div>
+              <strong>Favoritos</strong>
+              <span>{{ item.totalFavoritos || 0 }}</span>
+            </div>
           </div>
         </div>
 
         <div class="detail-actions">
-          <button mat-raised-button color="primary" type="button" (click)="toggleFavorito()">
+          <button mat-raised-button [color]="item.favoritado ? 'warn' : 'primary'" type="button" (click)="toggleFavorito()" class="fav-btn-detail" [class.fav-active]="item.favoritado">
+            <mat-icon>{{ item.favoritado ? 'favorite' : 'favorite_border' }}</mat-icon>
             {{ item.favoritado ? 'Desfavoritar' : 'Favoritar' }}
           </button>
 
@@ -62,6 +89,10 @@
           <button mat-stroked-button type="button" (click)="copyLink()">
             Copiar link
           </button>
+
+          <a *ngIf="item.id" mat-stroked-button color="primary" [routerLink]="['/chat', item.id]">
+            Abrir chat
+          </a>
 
           <a *ngIf="whatsappLink" mat-stroked-button color="accent" [href]="whatsappLink" target="_blank" rel="noopener noreferrer">
             Falar no WhatsApp
@@ -106,3 +137,17 @@
     </div>
   </ng-template>
 </section>
+
+<div class="lightbox-overlay" *ngIf="lightboxOpen" (click)="closeLightbox()">
+  <img [src]="lightboxUrl" alt="Imagem em tela cheia" (click)="$event.stopPropagation()">
+  <button class="lightbox-close" type="button" (click)="closeLightbox()" aria-label="Fechar">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<div class="lightbox-overlay" *ngIf="lightboxOpen" (click)="closeLightbox()">
+  <img [src]="lightboxUrl" alt="Imagem em tela cheia" (click)="$event.stopPropagation()">
+  <button class="lightbox-close" type="button" (click)="closeLightbox()" aria-label="Fechar">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>

@@ -23,14 +23,38 @@
       <ng-template #loggedMenu>
         <span class="user-name">Olá, {{ (currentUser$ | async)?.nome }}</span>
         <button *ngIf="(currentUser$ | async)?.role === 'ADMIN'" mat-stroked-button class="action-btn secondary" [routerLink]="['/admin']">Admin</button>
+        <button mat-stroked-button class="action-btn secondary unread-btn" [routerLink]="['/mensagens']" [matBadge]="unreadCount" [matBadgeHidden]="!unreadCount" matBadgeColor="warn">Mensagens</button>
         <button mat-stroked-button class="action-btn secondary" [routerLink]="['/minha-conta']">Minha conta</button>
         <button mat-flat-button class="action-btn danger" (click)="logout()">Sair</button>
       </ng-template>
     </div>
+
+    <!-- Hamburger (mobile only) -->
+    <button class="hamburger-btn" type="button" (click)="toggleMobileMenu()" [attr.aria-label]="mobileMenuOpen ? 'Fechar menu' : 'Abrir menu'">
+      <mat-icon>{{ mobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
+    </button>
   </mat-toolbar-row>
 </mat-toolbar>
 
+<!-- Mobile dropdown menu -->
+<div class="mobile-menu" [class.open]="mobileMenuOpen">
+  <ng-container *ngIf="!(authState$ | async); else mobileLoggedMenu">
+    <a mat-button [routerLink]="['/login']" (click)="mobileMenuOpen = false">Entrar</a>
+    <a mat-button [routerLink]="['/register']" (click)="mobileMenuOpen = false">Cadastre-se</a>
+  </ng-container>
+  <ng-template #mobileLoggedMenu>
+    <span class="mobile-user">Olá, {{ (currentUser$ | async)?.nome }}</span>
+    <a *ngIf="(currentUser$ | async)?.role === 'ADMIN'" mat-button [routerLink]="['/admin']" (click)="mobileMenuOpen = false">Admin</a>
+    <a mat-button [routerLink]="['/mensagens']" (click)="mobileMenuOpen = false">
+      Mensagens
+      <span class="badge-chip" *ngIf="unreadCount">{{ unreadCount }}</span>
+    </a>
+    <a mat-button [routerLink]="['/minha-conta']" (click)="mobileMenuOpen = false">Minha conta</a>
+    <button mat-button class="mobile-logout" (click)="logout()">Sair</button>
+  </ng-template>
+</div>
+
 <div class="page-shell">
-  <router-outlet></router-outlet>
+  <router-outlet #outlet="outlet"></router-outlet>
 </div>
 

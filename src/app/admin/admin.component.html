@@ -1,6 +1,8 @@
 <section class="admin-page">
   <div class="admin-shell" *ngIf="loading">
-    <div class="admin-box">Carregando painel admin...</div>
+    <div class="admin-skeleton">
+      <div class="skel-stat shimmer" *ngFor="let i of [1,2,3,4]"></div>
+    </div>
   </div>
 
   <div class="admin-shell" *ngIf="!loading && dashboard as data">

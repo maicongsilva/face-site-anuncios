@@ -7,6 +7,8 @@ import { ProfileComponent } from './profile/profile.component';
 import { AnuncioDetailComponent } from './anuncio-detail/anuncio-detail.component';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { AdminComponent } from './admin/admin.component';
+import { ChatComponent } from './chat/chat.component';
+import { MessagesComponent } from './messages/messages.component';
 
 const routes: Routes = [
   {
@@ -33,6 +35,16 @@ const routes: Routes = [
   {
     path: 'admin',
     component: AdminComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'mensagens',
+    component: MessagesComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'chat/:id',
+    component: ChatComponent,
     canActivate: [AuthGuard]
   },
   {

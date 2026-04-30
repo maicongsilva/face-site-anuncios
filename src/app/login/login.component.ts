@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../shared/model/service/auth.service';
+import { getErrorMessage } from '../shared/utils/error.utils';
 
 @Component({
   selector: 'app-login',
@@ -31,7 +32,7 @@ export class LoginComponent implements OnInit {
       },
       error: (error) => {
         this.loading = false;
-        this.message = error?.error?.message || error?.error || 'Credenciais inválidas.';
+        this.message = getErrorMessage(error, 'login');
       }
     });
   }

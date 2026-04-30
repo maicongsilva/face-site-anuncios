@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { Anuncio } from 'src/app/shared/model/anuncio.model';
 import { AnuncioService } from 'src/app/shared/model/service/anuncio.service';
 import { AuthService } from 'src/app/shared/model/service/auth.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-anuncio-list',
   templateUrl: './anuncio-list.component.html',
   styleUrls: ['./anuncio-list.component.scss']
 })
-export class AnuncioListComponent implements OnInit {
+export class AnuncioListComponent implements OnInit, OnDestroy {
   cards: Array<Anuncio & { image: string; isNovo: boolean }> = [];
   loading = true;
   feedback = '';
@@ -24,65 +26,101 @@ export class AnuncioListComponent implements OnInit {
   readonly pageSize = 6;
   ordenacao = 'dataCriacao,desc';
   readonly categoriasRapidas = ['Tecnologia', 'Móveis', 'Esporte', 'Imóveis'];
+  private routeSub?: Subscription;
 
   constructor(
     private anuncioService: AnuncioService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute,
+    private snack: MatSnackBar
   ) { }
 
   ngOnInit(): void {
-    this.carregarAnuncios();
+    this.routeSub = this.route.queryParams.subscribe((params) => {
+      this.filtroTermo = params['q'] || '';
+      this.filtroCategoria = params['categoria'] || '';
+      this.filtroLocalizacao = params['localizacao'] || '';
+      this.filtroPrecoMin = params['precoMin'] ? Number(params['precoMin']) : null;
+      this.filtroPrecoMax = params['precoMax'] ? Number(params['precoMax']) : null;
+      this.ordenacao = params['ord'] || 'dataCriacao,desc';
+      this.paginaAtual = params['pagina'] ? Number(params['pagina']) : 0;
+      this.carregarAnuncios();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.routeSub?.unsubscribe();
   }
 
   aplicarFiltros(): void {
-    this.paginaAtual = 0;
-    this.carregarAnuncios();
+    this.navegarComFiltros(0);
   }
 
   limparFiltros(): void {
-    this.filtroTermo = '';
-    this.filtroCategoria = '';
-    this.filtroLocalizacao = '';
-    this.filtroPrecoMin = null;
-    this.filtroPrecoMax = null;
-    this.ordenacao = 'dataCriacao,desc';
-    this.paginaAtual = 0;
-    this.carregarAnuncios();
+    this.router.navigate(['/'], { queryParams: {} });
   }
 
   alterarOrdenacao(event: Event): void {
     this.ordenacao = (event.target as HTMLSelectElement).value;
-    this.paginaAtual = 0;
-    this.carregarAnuncios();
+    this.navegarComFiltros(0);
   }
 
   aplicarCategoriaRapida(categoria: string): void {
     this.filtroCategoria = this.filtroCategoria === categoria ? '' : categoria;
-    this.paginaAtual = 0;
-    this.carregarAnuncios();
+    this.navegarComFiltros(0);
   }
 
   irParaPaginaAnterior(): void {
-    if (this.paginaAtual === 0) {
-      return;
-    }
-
-    this.paginaAtual -= 1;
-    this.carregarAnuncios(true);
+    if (this.paginaAtual === 0) return;
+    this.navegarComFiltros(this.paginaAtual - 1);
   }
 
   irParaProximaPagina(): void {
-    if (this.paginaAtual >= this.totalPaginas - 1) {
-      return;
-    }
+    if (this.paginaAtual >= this.totalPaginas - 1) return;
+    this.navegarComFiltros(this.paginaAtual + 1);
+  }
 
-    this.paginaAtual += 1;
-    this.carregarAnuncios(true);
+  irParaPagina(pagina: number): void {
+    if (pagina === this.paginaAtual) return;
+    this.navegarComFiltros(pagina);
+  }
+
+  private navegarComFiltros(pagina: number): void {
+    const qp: Record<string, string | number> = {};
+    if (this.filtroTermo.trim()) qp['q'] = this.filtroTermo.trim();
+    if (this.filtroCategoria.trim()) qp['categoria'] = this.filtroCategoria.trim();
+    if (this.filtroLocalizacao.trim()) qp['localizacao'] = this.filtroLocalizacao.trim();
+    if (this.filtroPrecoMin !== null) qp['precoMin'] = this.filtroPrecoMin;
+    if (this.filtroPrecoMax !== null) qp['precoMax'] = this.filtroPrecoMax;
+    if (this.ordenacao !== 'dataCriacao,desc') qp['ord'] = this.ordenacao;
+    if (pagina > 0) qp['pagina'] = pagina;
+    this.router.navigate(['/'], { queryParams: qp });
   }
 
   voltarAoTopo(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  get pageButtons(): (number | '...')[] {
+    if (this.totalPaginas <= 7) {
+      return Array.from({ length: this.totalPaginas }, (_, i) => i);
+    }
+    const cur = this.paginaAtual;
+    const last = this.totalPaginas - 1;
+    const pages: (number | '...')[] = [0];
+    if (cur > 2) pages.push('...');
+    for (let i = Math.max(1, cur - 1); i <= Math.min(last - 1, cur + 1); i++) {
+      pages.push(i);
+    }
+    if (cur < last - 2) pages.push('...');
+    pages.push(last);
+    return pages;
+  }
+
+  get precoInvalido(): boolean {
+    return !!this.filtroPrecoMin && !!this.filtroPrecoMax
+      && this.filtroPrecoMax < this.filtroPrecoMin;
   }
 
   atualizarCampoTexto(campo: 'filtroTermo' | 'filtroCategoria' | 'filtroLocalizacao', event: Event): void {
@@ -114,20 +152,19 @@ export class AnuncioListComponent implements OnInit {
               isNovo: item.isNovo
             }
           : item);
+        const msg = updated.favoritado ? 'Adicionado aos favoritos' : 'Removido dos favoritos';
+        this.snack.open(msg, '', { duration: 2500 });
       },
       error: () => {
-        this.feedback = 'Não foi possível atualizar os favoritos agora.';
+        this.snack.open('Não foi possível atualizar os favoritos', 'Fechar', { duration: 3000 });
       }
     });
   }
 
-  private carregarAnuncios(scrollToTop = false): void {
+  private carregarAnuncios(): void {
     this.loading = true;
     this.feedback = '';
-
-    if (scrollToTop) {
-      this.voltarAoTopo();
-    }
+    this.voltarAoTopo();
 
     const [sortBy, direction] = this.ordenacao.split(',');
 
