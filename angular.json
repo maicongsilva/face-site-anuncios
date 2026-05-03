@@ -59,7 +59,7 @@
                 }
               ],
               "outputHashing": "all",
-              "baseHref": "/face-site-anuncios/"
+              "baseHref": "/"
             },
             "development": {
               "buildOptimizer": false,
