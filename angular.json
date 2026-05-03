@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "face-login-siteanuncios": {
+    "face-site-anuncios": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/face-login-siteanuncios",
+            "outputPath": "dist/face-site-anuncios",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -76,10 +76,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "face-login-siteanuncios:build:production"
+              "browserTarget": "face-site-anuncios:build:production"
             },
             "development": {
-              "browserTarget": "face-login-siteanuncios:build:development"
+              "browserTarget": "face-site-anuncios:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -87,7 +87,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "face-login-siteanuncios:build"
+            "browserTarget": "face-site-anuncios:build"
           }
         },
         "test": {
