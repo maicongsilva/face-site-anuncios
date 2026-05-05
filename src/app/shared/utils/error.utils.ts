@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from '@angular/common/http';
+﻿import { HttpErrorResponse } from '@angular/common/http';
 
 export type ErrorContext = 'login' | 'register' | 'generic';
 
@@ -17,9 +17,13 @@ export function getErrorMessage(error: unknown, context: ErrorContext = 'generic
     return 'Servidor indisponível. Verifique sua conexão e tente novamente.';
   }
 
-  // Extract a clean backend message if present
+  // Extract a clean backend message — backend may return a plain string or an object with message
   const backendMessage: string | undefined =
-    typeof err.error?.message === 'string' ? err.error.message : undefined;
+    typeof err.error === 'string' && err.error.trim() !== ''
+      ? err.error
+      : typeof err.error?.message === 'string'
+      ? err.error.message
+      : undefined;
 
   const isBackendMessageClean =
     backendMessage &&
