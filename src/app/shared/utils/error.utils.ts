@@ -31,6 +31,15 @@ export function getErrorMessage(error: unknown, context: ErrorContext = 'generic
     !backendMessage.toLowerCase().includes('exception') &&
     !backendMessage.toLowerCase().includes('stack');
 
+  const isDuplicateUserMessage =
+    context === 'register' &&
+    !!backendMessage &&
+    /\b(já|ja)\s+existe\b/i.test(backendMessage);
+
+  if (isDuplicateUserMessage) {
+    return 'Já existe um usuário com esse nome.';
+  }
+
   switch (err.status) {
     case 400:
       return isBackendMessageClean ? backendMessage! : 'Dados inválidos. Verifique as informações e tente novamente.';
@@ -57,6 +66,12 @@ export function getErrorMessage(error: unknown, context: ErrorContext = 'generic
     case 502:
     case 503:
     case 504:
+      if (context === 'login') {
+        return 'Não foi possível entrar agora. Tente novamente em instantes.';
+      }
+      if (context === 'register') {
+        return 'Não foi possível concluir o cadastro agora. Tente novamente em instantes.';
+      }
       return 'Erro interno do servidor. Tente novamente mais tarde.';
 
     default:
