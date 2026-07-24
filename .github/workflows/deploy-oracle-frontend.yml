@@ -1,17 +1,28 @@
 name: Deploy Frontend to Oracle VM
 
 on:
+  workflow_run:
+    workflows:
+      - Deploy to GitHub Pages
+    types:
+      - completed
   workflow_dispatch:
-  push:
-    branches:
-      - main
+
+concurrency:
+  group: deploy-oracle-frontend
+  cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
 
       - name: Prepare SSH key
         run: |
