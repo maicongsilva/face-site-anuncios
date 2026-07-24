@@ -2,6 +2,7 @@ import { HttpClient, HttpClientModule, HttpHeaders } from "@angular/common/http"
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { ResponsePageable } from "../responsePageable.model";
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -9,11 +10,11 @@ import { ResponsePageable } from "../responsePageable.model";
 
 export class ItemService{
 
-  apiUrl = 'http://localhost:8080/itens'
+  private readonly apiUrl = `${environment.apiUrl}/itens`;
 
   httpOptions = {
     headers: new HttpHeaders({
-      'Content-Type': 'aplication/json'
+      'Content-Type': 'application/json'
     })
   };
   constructor(

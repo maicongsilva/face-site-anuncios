@@ -180,6 +180,8 @@ export class AnuncioService {
       return new URL(environment.apiUrl).origin;
     }
 
-    return 'http://localhost:8080';
+    return typeof window !== 'undefined' && window.location?.origin
+      ? window.location.origin
+      : '';
   }
 }
