@@ -59,4 +59,4 @@ jobs:
           OCI_USERNAME: ${{ secrets.OCI_USERNAME }}
         run: |
           ssh $SSH_OPTS -i "$RUNNER_TEMP/oci_deploy_key" -p "$OCI_PORT" "$OCI_USERNAME@$OCI_HOST" \
-            "cd /opt/site-anuncios/site-anuncios-java && docker compose -f docker-compose.oracle.yml up -d --build frontend && docker compose -f docker-compose.oracle.yml ps"
+            "exec 200>/tmp/site-anuncios-deploy.lock && flock 200 && cd /opt/site-anuncios/site-anuncios-java && docker compose -f docker-compose.oracle.yml up -d --build frontend && docker compose -f docker-compose.oracle.yml ps"
