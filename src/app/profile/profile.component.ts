@@ -7,6 +7,7 @@ import { Anuncio } from '../shared/model/anuncio.model';
 import { ChatThread } from '../shared/model/chat-thread.model';
 import { AnuncioService } from '../shared/model/service/anuncio.service';
 import { ChatService } from '../shared/model/service/chat.service';
+import { getErrorMessage } from '../shared/utils/error.utils';
 
 @Component({
   selector: 'app-profile',
@@ -143,9 +144,9 @@ export class ProfileComponent implements OnInit {
         this.submitting = false;
         this.resetFormulario();
       },
-      error: () => {
+      error: (error) => {
         this.submitting = false;
-        this.feedback = 'Não foi possível salvar o anúncio agora.';
+        this.feedback = getErrorMessage(error);
       }
     });
   }
