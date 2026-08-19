@@ -95,8 +95,8 @@
 
               <div class="full-width upload-box">
                 <label for="anuncio-image"><strong>Fotos do anúncio</strong></label>
-                <input id="anuncio-image" type="file" accept="image/*" multiple (change)="onImageSelected($event)">
-                <small>Selecione até 6 imagens para criar uma galeria mais atrativa.</small>
+                <input id="anuncio-image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple (change)="onImageSelected($event)">
+                <small>Formatos aceitos: JPG, PNG, WEBP e GIF. Selecione até 6 imagens para criar uma galeria mais atrativa.</small>
 
                 <div class="preview-gallery" *ngIf="previewImages.length">
                   <img

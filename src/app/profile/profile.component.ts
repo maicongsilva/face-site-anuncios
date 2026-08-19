@@ -15,6 +15,7 @@ import { getErrorMessage } from '../shared/utils/error.utils';
   styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent implements OnInit {
+  private readonly allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
   currentUser$: Observable<AuthUser | null> = this.authService.currentUser$;
   meusAnuncios: Anuncio[] = [];
   meusFavoritos: Anuncio[] = [];
@@ -214,6 +215,17 @@ export class ProfileComponent implements OnInit {
 
     const files = Array.from(input.files || []);
     if (!files.length) {
+      return;
+    }
+
+    const invalidFile = files.find((item) => !this.allowedImageTypes.includes(item.type));
+    if (invalidFile) {
+      this.feedback = 'Formato de imagem nao suportado. Use JPG, PNG, WEBP ou GIF.';
+      input.value = '';
+      this.selectedImageFile = null;
+      this.selectedGalleryFiles = [];
+      this.previewImage = null;
+      this.previewImages = [];
       return;
     }
 
