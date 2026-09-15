@@ -9,6 +9,8 @@ export function getErrorMessage(error: unknown, context: ErrorContext = 'generic
 
   const err = error as HttpErrorResponse;
 
+  const backendMessage = extractBackendMessage(err.error);
+
   // Proxy / network error: status 0 OR error body is a proxy string
   if (
     err.status === 0 ||
@@ -16,14 +18,6 @@ export function getErrorMessage(error: unknown, context: ErrorContext = 'generic
   ) {
     return 'Servidor indisponível. Verifique sua conexão e tente novamente.';
   }
-
-  // Extract a clean backend message — backend may return a plain string or an object with message
-  const backendMessage: string | undefined =
-    typeof err.error === 'string' && err.error.trim() !== ''
-      ? err.error
-      : typeof err.error?.message === 'string'
-      ? err.error.message
-      : undefined;
 
   const isBackendMessageClean =
     backendMessage &&
@@ -77,4 +71,40 @@ export function getErrorMessage(error: unknown, context: ErrorContext = 'generic
     default:
       return isBackendMessageClean ? backendMessage! : 'Ocorreu um erro inesperado. Tente novamente.';
   }
+}
+
+function extractBackendMessage(errorBody: unknown): string | undefined {
+  if (typeof errorBody === 'string') {
+    return errorBody.trim() || undefined;
+  }
+
+  if (Array.isArray(errorBody)) {
+    const messages = errorBody
+      .map((item) => {
+        if (typeof item === 'string') {
+          return item.trim();
+        }
+
+        if (item && typeof item === 'object') {
+          const candidate = (item as { defaultMessage?: unknown; message?: unknown }).defaultMessage
+            ?? (item as { defaultMessage?: unknown; message?: unknown }).message;
+
+          return typeof candidate === 'string' ? candidate.trim() : '';
+        }
+
+        return '';
+      })
+      .filter(Boolean);
+
+    return messages.length ? messages.join(' | ') : undefined;
+  }
+
+  if (errorBody && typeof errorBody === 'object') {
+    const candidate = (errorBody as { message?: unknown }).message;
+    if (typeof candidate === 'string' && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+
+  return undefined;
 }
