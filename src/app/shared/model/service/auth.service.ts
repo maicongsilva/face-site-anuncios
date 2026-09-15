@@ -40,6 +40,14 @@ export class AuthService {
     );
   }
 
+  requestPasswordReset(email: string): Observable<{ message: string; token?: string }> {
+    return this.http.post<{ message: string; token?: string }>(`${this.apiUrl}/auth/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, novaSenha: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/auth/reset-password`, { token, novaSenha });
+  }
+
   fetchMe(): Observable<AuthUser> {
     return this.http.get<AuthUser>(`${this.apiUrl}/auth/me`).pipe(
       tap((user) => {

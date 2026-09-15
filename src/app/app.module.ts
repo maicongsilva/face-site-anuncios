@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { AppRoutingModule } from './app-routing.module';
@@ -26,6 +26,7 @@ import { AuthInterceptor } from './shared/interceptors/auth.interceptor';
 import { AdminComponent } from './admin/admin.component';
 import { ChatComponent } from './chat/chat.component';
 import { MessagesComponent } from './messages/messages.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { MessagesComponent } from './messages/messages.component';
     AnuncioDetailComponent,
     AdminComponent,
     ChatComponent,
-    MessagesComponent
+    MessagesComponent,
+    ResetPasswordComponent
   ],
   providers: [
     {
@@ -49,6 +51,7 @@ import { MessagesComponent } from './messages/messages.component';
     BrowserModule,
     AppRoutingModule,
     ReactiveFormsModule,
+    FormsModule,
     BrowserAnimationsModule,
     MatSlideToggleModule,
     HomeModule,

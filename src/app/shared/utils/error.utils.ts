@@ -1,6 +1,6 @@
 ﻿import { HttpErrorResponse } from '@angular/common/http';
 
-export type ErrorContext = 'login' | 'register' | 'generic';
+export type ErrorContext = 'login' | 'register' | 'reset-password' | 'generic';
 
 export function getErrorMessage(error: unknown, context: ErrorContext = 'generic'): string {
   if (!error) {

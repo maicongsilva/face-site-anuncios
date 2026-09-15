@@ -9,6 +9,7 @@ import { AuthGuard } from './shared/guards/auth.guard';
 import { AdminComponent } from './admin/admin.component';
 import { ChatComponent } from './chat/chat.component';
 import { MessagesComponent } from './messages/messages.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 const routes: Routes = [
   {
@@ -22,6 +23,10 @@ const routes: Routes = [
   {
     path: 'register',
     component: RegisterComponent,
+  },
+  {
+    path: 'resetar-senha',
+    component: ResetPasswordComponent,
   },
   {
     path: 'minha-conta',
