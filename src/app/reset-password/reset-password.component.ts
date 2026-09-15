@@ -39,10 +39,10 @@ export class ResetPasswordComponent {
       next: (response) => {
         this.loading = false;
         this.success = true;
-        this.message = response.message || 'Se o e-mail estiver cadastrado, você receberá as instruções.';
+        this.message = response.message || 'Se o e-mail estiver cadastrado, você receberá as instruções para redefinir sua senha.';
         if (response.token) {
           this.token = response.token;
-          this.message = 'Token gerado com sucesso. Agora informe sua nova senha abaixo.';
+          this.message = 'Código recebido com sucesso. Agora escolha sua nova senha abaixo.';
         }
       },
       error: (error) => {
@@ -57,7 +57,7 @@ export class ResetPasswordComponent {
     this.success = false;
 
     if (!this.token.trim()) {
-      this.message = 'Token de redefinição não informado.';
+      this.message = 'Digite o código recebido por e-mail para continuar.';
       return;
     }
 
