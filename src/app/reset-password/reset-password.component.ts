@@ -13,7 +13,8 @@ export class ResetPasswordComponent {
   token = '';
   novaSenha = '';
   confirmacaoSenha = '';
-  loading = false;
+  requestLoading = false;
+  resetLoading = false;
   message = '';
   success = false;
 
@@ -34,10 +35,10 @@ export class ResetPasswordComponent {
       return;
     }
 
-    this.loading = true;
+    this.requestLoading = true;
     this.authService.requestPasswordReset(this.email).subscribe({
       next: (response) => {
-        this.loading = false;
+        this.requestLoading = false;
         this.success = true;
         this.message = response.message || 'Se o e-mail estiver cadastrado, você receberá as instruções para redefinir sua senha.';
         if (response.token) {
@@ -46,7 +47,7 @@ export class ResetPasswordComponent {
         }
       },
       error: (error) => {
-        this.loading = false;
+        this.requestLoading = false;
         this.message = getErrorMessage(error, 'reset-password');
       }
     });
@@ -71,16 +72,16 @@ export class ResetPasswordComponent {
       return;
     }
 
-    this.loading = true;
+    this.resetLoading = true;
     this.authService.resetPassword(this.token, this.novaSenha).subscribe({
       next: (response) => {
-        this.loading = false;
+        this.resetLoading = false;
         this.success = true;
         this.message = response.message || 'Senha redefinida com sucesso.';
         setTimeout(() => this.router.navigate(['/login']), 1800);
       },
       error: (error) => {
-        this.loading = false;
+        this.resetLoading = false;
         this.message = getErrorMessage(error, 'reset-password');
       }
     });
