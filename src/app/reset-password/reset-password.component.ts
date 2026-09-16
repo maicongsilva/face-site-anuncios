@@ -30,13 +30,19 @@ export class ResetPasswordComponent {
     this.message = '';
     this.success = false;
 
-    if (!this.email.trim()) {
+    const email = this.email.trim();
+    if (!email) {
       this.message = 'Informe o e-mail da conta para receber a redefinição.';
       return;
     }
 
+    if (!email.includes('@')) {
+      this.message = 'Informe um e-mail válido para continuar.';
+      return;
+    }
+
     this.requestLoading = true;
-    this.authService.requestPasswordReset(this.email).subscribe({
+    this.authService.requestPasswordReset(email).subscribe({
       next: (response) => {
         this.requestLoading = false;
         this.success = true;
@@ -62,8 +68,18 @@ export class ResetPasswordComponent {
       return;
     }
 
+    if (!this.novaSenha.trim()) {
+      this.message = 'Digite a nova senha para continuar.';
+      return;
+    }
+
     if (this.novaSenha.length < 6) {
       this.message = 'A nova senha deve ter pelo menos 6 caracteres.';
+      return;
+    }
+
+    if (!this.confirmacaoSenha.trim()) {
+      this.message = 'Confirme a nova senha para continuar.';
       return;
     }
 
