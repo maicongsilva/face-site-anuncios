@@ -46,11 +46,7 @@ export class ResetPasswordComponent {
       next: (response) => {
         this.requestLoading = false;
         this.success = true;
-        this.message = response.message || 'Se o e-mail estiver cadastrado, você receberá as instruções para redefinir sua senha.';
-        if (response.token) {
-          this.token = response.token;
-          this.message = 'Código recebido com sucesso. Agora escolha sua nova senha abaixo.';
-        }
+        this.message = response.message || 'Enviamos o link para o seu e-mail. Abra a mensagem para criar uma nova senha.';
       },
       error: (error) => {
         this.requestLoading = false;
