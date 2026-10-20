@@ -256,6 +256,12 @@
   box-shadow: 0 22px 48px rgba(15, 23, 42, 0.14);
 }
 
+/* Anuncio unico nunca estica alem do tamanho padrao do card */
+.showcase-card:only-child {
+  max-width: 340px;
+  width: 100%;
+}
+
 .card-body {
   flex: 1;
   display: flex;
