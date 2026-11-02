@@ -12,7 +12,13 @@
   max-width: 900px;
   margin: 0 auto;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 20px;
+}
+
+.profile-tabs {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .profile-card {
@@ -197,6 +203,35 @@
 }
 
 @media (max-width: 768px) {
+  .profile-page {
+    padding: 16px 12px;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .profile-shell,
+  .profile-card,
+  .publish-form {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .publish-form > *,
+  .publish-form mat-form-field,
+  .publish-form select,
+  .publish-form input,
+  .publish-form textarea {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .profile-tabs {
+    max-width: 100%;
+  }
+
   .publish-form {
     grid-template-columns: 1fr;
   }

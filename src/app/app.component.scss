@@ -8,6 +8,8 @@
   position: sticky;
   top: 0;
   z-index: 1000;
+  width: 100%;
+  box-sizing: border-box;
   background: linear-gradient(90deg, #0f172a 0%, #1d4ed8 100%);
   color: #fff;
   box-shadow: 0 8px 30px rgba(15, 23, 42, 0.18);
