@@ -10,6 +10,7 @@ import { HomeRoutingModule } from './home-routing.module';
 import { HomeComponent } from './home.component';
 import { AnuncioListComponent } from './anuncio-list/anuncio-list.component';
 import { NovoUsuarioComponent } from './novo-usuario/novo-usuario.component';
+import { PrecoAnuncioPipe } from '../shared/pipes/preco-anuncio.pipe';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import { NovoUsuarioComponent } from './novo-usuario/novo-usuario.component';
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    RouterModule
+    RouterModule,
+    PrecoAnuncioPipe
   ],
   exports: [
     HomeComponent

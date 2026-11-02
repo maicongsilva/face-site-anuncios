@@ -27,6 +27,7 @@ import { AdminComponent } from './admin/admin.component';
 import { ChatComponent } from './chat/chat.component';
 import { MessagesComponent } from './messages/messages.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { PrecoAnuncioPipe } from './shared/pipes/preco-anuncio.pipe';
 
 @NgModule({
   declarations: [
@@ -67,7 +68,8 @@ import { ResetPasswordComponent } from './reset-password/reset-password.componen
     MatCardModule,
     MatBadgeModule,
     MatSnackBarModule,
-    MatTabsModule
+    MatTabsModule,
+    PrecoAnuncioPipe
   ]
 })
 export class AppModule { }

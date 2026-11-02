@@ -89,7 +89,7 @@
         <p class="card-desc">{{ card.descricao }}</p>
 
         <div class="meta-line">
-          <strong>{{ card.preco | currency:'BRL':'symbol':'1.2-2' }}</strong>
+          <strong>{{ card.preco | precoAnuncio:card.tipoCobranca }}</strong>
           <span class="location-line"><mat-icon class="inline-icon">place</mat-icon>{{ card.localizacao }}</span>
         </div>
 

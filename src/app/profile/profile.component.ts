@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroupDirective, Validators } from '@angular/forms';
 import { Observable, of, Subscription, switchMap } from 'rxjs';
 import { AuthService } from '../shared/model/service/auth.service';
 import { AuthUser } from '../shared/model/auth.model';
-import { Anuncio } from '../shared/model/anuncio.model';
+import { Anuncio, TipoCobranca } from '../shared/model/anuncio.model';
 import { ChatThread } from '../shared/model/chat-thread.model';
 import { AnuncioService } from '../shared/model/service/anuncio.service';
 import { ChatService } from '../shared/model/service/chat.service';
@@ -16,6 +16,8 @@ import { getErrorMessage } from '../shared/utils/error.utils';
 })
 export class ProfileComponent implements OnInit {
   private readonly allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  readonly categoriasAnuncio = ['Tecnologia', 'Móveis', 'Esporte', 'Imóveis', 'Aulas', 'Serviços', 'Produtos', 'Veículos', 'Outros'];
+  categoriaAtualLegada: string | null = null;
   currentUser$: Observable<AuthUser | null> = this.authService.currentUser$;
   meusAnuncios: Anuncio[] = [];
   meusFavoritos: Anuncio[] = [];
@@ -31,6 +33,7 @@ export class ProfileComponent implements OnInit {
   selectedImageFile: File | null = null;
   selectedGalleryFiles: File[] = [];
   currentImageUrl: string | null = null;
+  @ViewChild('anuncioFormDirective') private anuncioFormDirective?: FormGroupDirective;
 
   profileForm = this.fb.group({
     nome: this.fb.control('', { nonNullable: true, validators: [Validators.required, Validators.minLength(3)] }),
@@ -43,7 +46,8 @@ export class ProfileComponent implements OnInit {
     descricao: this.fb.control('', { nonNullable: true, validators: [Validators.required, Validators.minLength(10)] }),
     categoria: this.fb.control('', { nonNullable: true, validators: [Validators.required] }),
     localizacao: this.fb.control('', { nonNullable: true, validators: [Validators.required] }),
-    preco: this.fb.control<number | null>(null, [Validators.required, Validators.min(0)])
+    preco: this.fb.control<number | null>(null, [Validators.required, Validators.min(0)]),
+    tipoCobranca: this.fb.control<TipoCobranca>('UNICO', { nonNullable: true })
   });
 
   constructor(
@@ -113,6 +117,7 @@ export class ProfileComponent implements OnInit {
       categoria: formValue.categoria,
       localizacao: formValue.localizacao,
       preco: Number(formValue.preco ?? 0),
+      tipoCobranca: this.permiteTipoCobranca ? formValue.tipoCobranca : 'UNICO',
       imagemUrl: this.toRelativeImageUrl(this.currentImageUrl) || undefined
     };
 
@@ -154,6 +159,7 @@ export class ProfileComponent implements OnInit {
 
   editarAnuncio(anuncio: Anuncio): void {
     this.editingId = anuncio.id || null;
+    this.categoriaAtualLegada = this.categoriasAnuncio.includes(anuncio.categoria) ? null : anuncio.categoria;
     this.currentImageUrl = anuncio.imagemUrl || null;
     this.previewImage = anuncio.imagemUrl || null;
     this.previewImages = anuncio.imagens?.length ? anuncio.imagens : (anuncio.imagemUrl ? [anuncio.imagemUrl] : []);
@@ -164,7 +170,8 @@ export class ProfileComponent implements OnInit {
       descricao: anuncio.descricao,
       categoria: anuncio.categoria,
       localizacao: anuncio.localizacao,
-      preco: anuncio.preco
+      preco: anuncio.preco,
+      tipoCobranca: anuncio.tipoCobranca || 'UNICO'
     });
     this.feedback = 'Editando anúncio selecionado.';
   }
@@ -241,19 +248,30 @@ export class ProfileComponent implements OnInit {
     this.feedback = 'Edição cancelada.';
   }
 
+  get permiteTipoCobranca(): boolean {
+    const categoria = this.anuncioForm.controls.categoria.value;
+    return categoria === 'Aulas' || categoria === 'Serviços';
+  }
+
+  atualizarTipoCobranca(): void {
+    this.anuncioForm.controls.tipoCobranca.setValue(this.permiteTipoCobranca ? 'HORA' : 'UNICO');
+  }
+
   private resetFormulario(): void {
     this.editingId = null;
+    this.categoriaAtualLegada = null;
     this.previewImage = null;
     this.previewImages = [];
     this.selectedImageFile = null;
     this.selectedGalleryFiles = [];
     this.currentImageUrl = null;
-    this.anuncioForm.reset({
+    this.anuncioFormDirective?.resetForm({
       titulo: '',
       descricao: '',
       categoria: '',
       localizacao: '',
-      preco: null
+      preco: null,
+      tipoCobranca: 'UNICO'
     });
   }
 

@@ -36,7 +36,7 @@
             <mat-icon class="field-icon">sell</mat-icon>
             <div>
               <strong>Preço</strong>
-              <span>{{ item.preco | currency:'BRL':'symbol':'1.2-2' }}</span>
+              <span>{{ item.preco | precoAnuncio:item.tipoCobranca }}</span>
             </div>
           </div>
           <div class="detail-item">
@@ -120,7 +120,7 @@
           <img *ngIf="related.imagemUrl" [src]="related.imagemUrl" [alt]="related.titulo" class="related-image">
           <mat-card-content>
             <strong>{{ related.titulo }}</strong>
-            <span>{{ related.preco | currency:'BRL':'symbol':'1.2-2' }}</span>
+            <span>{{ related.preco | precoAnuncio:related.tipoCobranca }}</span>
             <small>{{ related.localizacao }}</small>
           </mat-card-content>
           <mat-card-actions>

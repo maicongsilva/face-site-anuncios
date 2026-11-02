@@ -5,6 +5,7 @@ export interface Anuncio {
   categoria: string;
   localizacao: string;
   preco: number;
+  tipoCobranca?: TipoCobranca;
   imagemUrl?: string;
   imagens?: string[];
   favoritado?: boolean;
@@ -15,6 +16,8 @@ export interface Anuncio {
   anuncianteTelefone?: string;
   anuncianteEmail?: string;
 }
+
+export type TipoCobranca = 'UNICO' | 'HORA' | 'DIA' | 'MES' | 'PROJETO';
 
 export interface AnuncioPage {
   content: Anuncio[];
