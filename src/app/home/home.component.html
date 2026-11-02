@@ -1,28 +1,23 @@
 <section class="home-hero">
   <div class="hero-copy">
-    <div class="hero-text">
-      <span class="hero-badge">Super Unidos</span>
-      <h1>Conectando negócios, pessoas e oportunidades</h1>
-      <p>Descubra anúncios relevantes, conecte-se com oportunidades reais e cresça com uma plataforma pensada para negócios e pessoas.</p>
-      <div class="hero-actions">
-        <a class="hero-link primary" [routerLink]="['/register']">Criar conta</a>
-        <a class="hero-link secondary" [routerLink]="['/login']">Já tenho login</a>
-      </div>
+    <!-- Coluna da Esquerda: Letreiro em destaque com as 4 frases -->
+    <div class="hero-billboard">
+      <h1 class="billboard-phrase">Site de Anúncios <em class="brand-name">Super-Unidos</em></h1>
+      <p class="billboard-phrase">Um site diferenciado</p>
+      <p class="billboard-phrase">Sinceridade é tudo</p>
+      <p class="billboard-phrase">Unidos, Crescemos</p>
     </div>
 
-    <div class="hero-highlights">
-      <div class="highlight-card">
-        <strong>✅ Conexão segura</strong>
-        <span>Crie sua conta e gerencie seu perfil com confiança.</span>
-      </div>
-      <div class="highlight-card">
-        <strong>📦 Oportunidades reais</strong>
-        <span>Encontre anúncios relevantes e negócios com boa visibilidade.</span>
-      </div>
-      <div class="highlight-card">
-        <strong>🚀 Crescimento</strong>
-        <span>Amplie alcance, fortaleça contatos e transforme oportunidades em resultados.</span>
-      </div>
+    <!-- Coluna da Direita: Botões de ação grandes e de fácil destaque -->
+    <div class="hero-actions-panel">
+      <a class="hero-big-btn primary" [routerLink]="['/register']">
+        <mat-icon class="btn-icon">person_add</mat-icon>
+        <span>Criar conta</span>
+      </a>
+      <a class="hero-big-btn secondary" [routerLink]="['/login']">
+        <mat-icon class="btn-icon">login</mat-icon>
+        <span>Já tenho login</span>
+      </a>
     </div>
   </div>
 </section>

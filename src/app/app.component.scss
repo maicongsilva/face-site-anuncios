@@ -29,23 +29,25 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.18);
   font-weight: 800;
+  font-size: 19px;
 }
 
 .brand-link {
   display: block;
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
 .brand-subtitle {
   display: block;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 11px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
 }
 
 .example-spacer {
@@ -53,17 +55,20 @@
 }
 
 .toolbar-search {
-  min-width: 180px;
+  min-width: 200px;
 }
 
 .toolbar-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .action-btn {
   border-radius: 999px;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  padding: 4px 18px !important;
 }
 
 .unread-btn {
@@ -76,7 +81,7 @@
 }
 
 .action-btn.secondary {
-  border-color: rgba(255, 255, 255, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
   color: #ffffff !important;
 }
 
@@ -86,7 +91,7 @@
 }
 
 .user-name {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   white-space: nowrap;
 }
