@@ -43,6 +43,7 @@
 
 .brand-name {
   font-style: italic;
+  white-space: nowrap;
   font-weight: 800;
   color: #7dd3fc;
 }
@@ -117,8 +118,14 @@
     padding: 24px;
   }
 
+  .hero-billboard {
+    padding: 24px 18px;
+  }
+
   .billboard-phrase {
-    font-size: 22px;
+    font-size: clamp(16px, 5.4vw, 22px);
+    hyphens: none;
+    overflow-wrap: normal;
   }
 
   .hero-big-btn {
