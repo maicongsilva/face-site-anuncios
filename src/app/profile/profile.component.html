@@ -95,11 +95,7 @@
               <mat-form-field appearance="outline" *ngIf="permiteTipoCobranca">
                 <mat-label>Tipo de cobrança / unidade</mat-label>
                 <select matNativeControl formControlName="tipoCobranca">
-                  <option value="UNICO">Valor total / único</option>
-                  <option value="HORA">Por hora</option>
-                  <option value="DIA">Por dia / diária</option>
-                  <option value="MES">Por mês</option>
-                  <option value="PROJETO">Por projeto / serviço</option>
+                  <option *ngFor="let opcao of opcoesCobranca" [value]="opcao">{{ rotulosCobranca[opcao] }}</option>
                 </select>
                 <mat-hint>O preço será exibido com esta unidade nos anúncios.</mat-hint>
               </mat-form-field>

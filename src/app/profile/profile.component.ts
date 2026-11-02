@@ -248,13 +248,34 @@ export class ProfileComponent implements OnInit {
     this.feedback = 'Edição cancelada.';
   }
 
+  readonly rotulosCobranca: Record<TipoCobranca, string> = {
+    UNICO: 'Valor total / único',
+    HORA: 'Por hora',
+    DIA: 'Por dia / diária',
+    MES: 'Por mês',
+    PROJETO: 'Por projeto / serviço'
+  };
+
+  private readonly cobrancaPorCategoria: Record<string, TipoCobranca[]> = {
+    'Aulas': ['HORA', 'DIA', 'MES', 'PROJETO'],
+    'Serviços': ['HORA', 'DIA', 'MES', 'PROJETO', 'UNICO'],
+    'Imóveis': ['UNICO', 'MES', 'DIA'],
+    'Esporte': ['UNICO', 'HORA', 'MES'],
+    'Tecnologia': ['UNICO', 'HORA', 'PROJETO'],
+    'Outros': ['UNICO', 'HORA', 'DIA', 'MES', 'PROJETO']
+  };
+
+  get opcoesCobranca(): TipoCobranca[] {
+    return this.cobrancaPorCategoria[this.anuncioForm.controls.categoria.value] ?? [];
+  }
+
   get permiteTipoCobranca(): boolean {
-    const categoria = this.anuncioForm.controls.categoria.value;
-    return categoria === 'Aulas' || categoria === 'Serviços';
+    return this.opcoesCobranca.length > 0;
   }
 
   atualizarTipoCobranca(): void {
-    this.anuncioForm.controls.tipoCobranca.setValue(this.permiteTipoCobranca ? 'HORA' : 'UNICO');
+    const opcoes = this.opcoesCobranca;
+    this.anuncioForm.controls.tipoCobranca.setValue(opcoes[0] ?? 'UNICO');
   }
 
   private resetFormulario(): void {
