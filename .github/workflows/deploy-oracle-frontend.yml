@@ -80,6 +80,20 @@ jobs:
           echo "Waiting up to 90 seconds for the deployment lock..."
           if ! flock --timeout 90 200; then
             echo "Deployment lock is still held by another process; aborting instead of waiting indefinitely." >&2
+            echo "Processes currently holding the deployment lock:" >&2
+            if command -v lslocks >/dev/null 2>&1; then
+              lock_pids="$(lslocks --noheadings --raw --output PID,PATH | awk '$2 == "/tmp/site-anuncios-deploy.lock" { print $1 }')"
+              if [ -n "$lock_pids" ]; then
+                while IFS= read -r pid; do
+                  ps -ww -o pid,ppid,etime,stat,args -p "$pid" >&2 || true
+                  ps -ww --ppid "$pid" -o pid,ppid,etime,stat,args >&2 || true
+                done <<< "$lock_pids"
+              else
+                echo "lslocks did not report a lock owner." >&2
+              fi
+            else
+              echo "lslocks is not installed; cannot identify the lock owner." >&2
+            fi
             exit 1
           fi
 
