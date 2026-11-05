@@ -108,8 +108,7 @@
               <div class="full-width upload-box">
                 <label for="anuncio-image"><strong>Fotos do anúncio</strong></label>
                 <input id="anuncio-image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple (change)="onImageSelected($event)">
-                <small>Formatos aceitos: JPG, PNG, WEBP e GIF. Até 6 imagens; elas são otimizadas automaticamente antes do envio.</small>
-                <small *ngIf="processingImages">Otimizando imagens...</small>
+                <small>Formatos aceitos: JPG, PNG, WEBP e GIF. Até 6 imagens.</small>
 
                 <div class="preview-gallery" *ngIf="existingImages.length">
                   <div class="preview-item" *ngFor="let image of existingImages; let i = index; let first = first; let last = last">
