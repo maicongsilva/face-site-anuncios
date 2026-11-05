@@ -149,7 +149,7 @@ export class AnuncioListComponent implements OnInit, OnDestroy {
         this.cards = this.cards.map((item) => item.id === updated.id
           ? {
               ...updated,
-              image: toThumbnailUrl(updated.imagemUrl) || this.getImageByCategory(updated.categoria),
+              image: toThumbnailUrl(updated.imagemUrl, 900) || this.getImageByCategory(updated.categoria),
               isNovo: item.isNovo
             }
           : item);
@@ -179,7 +179,7 @@ export class AnuncioListComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.cards = response.content.map((anuncio) => ({
           ...anuncio,
-          image: toThumbnailUrl(anuncio.imagemUrl) || this.getImageByCategory(anuncio.categoria),
+          image: toThumbnailUrl(anuncio.imagemUrl, 900) || this.getImageByCategory(anuncio.categoria),
           isNovo: this.isAnuncioNovo(anuncio.dataCriacao)
         }));
         this.totalPaginas = response.totalPages;

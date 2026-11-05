@@ -10,5 +10,5 @@ export function toThumbnailUrl(url: string | undefined | null, width = 480): str
     return url;
   }
 
-  return url.replace('/image/upload/', `/image/upload/w_${width},c_limit,f_auto,q_auto/`);
+  return url.replace('/image/upload/', `/image/upload/w_${width},c_limit,f_auto,q_auto:good/`);
 }

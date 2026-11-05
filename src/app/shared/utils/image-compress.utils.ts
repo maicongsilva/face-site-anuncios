@@ -2,8 +2,8 @@ export const MAX_IMAGES_PER_ANUNCIO = 6;
 // Margem abaixo do limite de 10 MB do servidor para o overhead do multipart.
 export const MAX_UPLOAD_TOTAL_BYTES = 9 * 1024 * 1024;
 
-const MAX_DIMENSION = 1600;
-const QUALITY = 0.82;
+const MAX_DIMENSION = 1920;
+const QUALITY = 0.92;
 
 export async function compressImage(file: File): Promise<File> {
   // GIFs podem ser animados; o canvas perderia a animação.
@@ -46,6 +46,15 @@ export async function compressImage(file: File): Promise<File> {
   } catch {
     return file;
   }
+}
+
+export function readAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
 }
 
 function toBlob(canvas: HTMLCanvasElement, type: string): Promise<Blob | null> {

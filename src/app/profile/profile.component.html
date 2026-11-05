@@ -83,8 +83,20 @@
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Localização</mat-label>
-                <input matInput formControlName="localizacao">
+                <mat-label>Estado</mat-label>
+                <select matNativeControl formControlName="uf" (change)="onUfChange()">
+                  <option value="" disabled>Selecione o estado</option>
+                  <option *ngFor="let uf of estados" [value]="uf">{{ uf }}</option>
+                </select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Cidade</mat-label>
+                <select matNativeControl formControlName="cidade">
+                  <option value="" disabled>{{ carregandoCidades ? 'Carregando cidades...' : 'Selecione a cidade' }}</option>
+                  <option *ngFor="let cidade of cidades" [value]="cidade">{{ cidade }}</option>
+                </select>
+                <mat-hint *ngIf="cidadesErro">{{ cidadesErro }}</mat-hint>
               </mat-form-field>
 
               <mat-form-field appearance="outline">

@@ -5,7 +5,7 @@ describe('toThumbnailUrl', () => {
 
   it('adds a resize transformation to Cloudinary URLs', () => {
     expect(toThumbnailUrl(cloud, 400)).toBe(
-      'https://res.cloudinary.com/demo/image/upload/w_400,c_limit,f_auto,q_auto/v123/anuncios/foto.jpg'
+      'https://res.cloudinary.com/demo/image/upload/w_400,c_limit,f_auto,q_auto:good/v123/anuncios/foto.jpg'
     );
   });
 

@@ -1,13 +1,14 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroupDirective, Validators } from '@angular/forms';
 import { catchError, Observable, of, Subscription, switchMap } from 'rxjs';
-import { compressImage, MAX_IMAGES_PER_ANUNCIO, MAX_UPLOAD_TOTAL_BYTES } from '../shared/utils/image-compress.utils';
+import { compressImage, MAX_IMAGES_PER_ANUNCIO, MAX_UPLOAD_TOTAL_BYTES, readAsDataUrl } from '../shared/utils/image-compress.utils';
 import { AuthService } from '../shared/model/service/auth.service';
 import { AuthUser } from '../shared/model/auth.model';
 import { Anuncio, TipoCobranca } from '../shared/model/anuncio.model';
 import { ChatThread } from '../shared/model/chat-thread.model';
 import { AnuncioService } from '../shared/model/service/anuncio.service';
 import { ChatService } from '../shared/model/service/chat.service';
+import { ESTADOS_BR, formatLocalizacao, LocalidadeService, parseLocalizacao } from '../shared/model/service/localidade.service';
 import { getErrorMessage } from '../shared/utils/error.utils';
 import { toThumbnailUrl } from '../shared/utils/thumbnail.utils';
 
@@ -40,6 +41,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private uploadFailed = false;
   private reorderFailed = false;
   currentImageUrl: string | null = null;
+  readonly estados = ESTADOS_BR;
+  cidades: string[] = [];
+  carregandoCidades = false;
+  cidadesErro = '';
   @ViewChild('anuncioFormDirective') private anuncioFormDirective?: FormGroupDirective;
 
   profileForm = this.fb.group({
@@ -52,7 +57,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     titulo: this.fb.control('', { nonNullable: true, validators: [Validators.required, Validators.minLength(3)] }),
     descricao: this.fb.control('', { nonNullable: true, validators: [Validators.required, Validators.minLength(10)] }),
     categoria: this.fb.control('', { nonNullable: true, validators: [Validators.required] }),
-    localizacao: this.fb.control('', { nonNullable: true, validators: [Validators.required] }),
+    uf: this.fb.control('', { nonNullable: true, validators: [Validators.required] }),
+    cidade: this.fb.control('', { nonNullable: true, validators: [Validators.required] }),
     preco: this.fb.control<number | null>(null, [Validators.required, Validators.min(0)]),
     tipoCobranca: this.fb.control<TipoCobranca>('UNICO', { nonNullable: true })
   });
@@ -61,6 +67,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private anuncioService: AnuncioService,
     private chatService: ChatService,
+    private localidadeService: LocalidadeService,
     private fb: FormBuilder
   ) {}
 
@@ -127,7 +134,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       titulo: formValue.titulo,
       descricao: formValue.descricao,
       categoria: formValue.categoria,
-      localizacao: formValue.localizacao,
+      localizacao: formatLocalizacao(formValue.cidade, formValue.uf),
       preco: Number(formValue.preco ?? 0),
       tipoCobranca: this.permiteTipoCobranca ? formValue.tipoCobranca : 'UNICO',
       imagemUrl: this.toRelativeImageUrl(this.currentImageUrl) || undefined
@@ -218,11 +225,52 @@ export class ProfileComponent implements OnInit, OnDestroy {
       titulo: anuncio.titulo,
       descricao: anuncio.descricao,
       categoria: anuncio.categoria,
-      localizacao: anuncio.localizacao,
       preco: anuncio.preco,
       tipoCobranca: anuncio.tipoCobranca || 'UNICO'
     });
-    this.feedback = 'Editando anúncio selecionado.';
+    this.preencherLocalizacao(anuncio.localizacao);
+    if (parseLocalizacao(anuncio.localizacao)) {
+      this.feedback = 'Editando anúncio selecionado.';
+    }
+  }
+
+  onUfChange(): void {
+    this.anuncioForm.controls.cidade.setValue('');
+    this.carregarCidades(this.anuncioForm.controls.uf.value);
+  }
+
+  private carregarCidades(uf: string, cidadeSelecionada = ''): void {
+    this.cidades = [];
+    this.cidadesErro = '';
+    if (!uf) {
+      return;
+    }
+    this.carregandoCidades = true;
+    this.localidadeService.listarMunicipios(uf).subscribe({
+      next: (cidades) => {
+        this.cidades = cidades;
+        this.carregandoCidades = false;
+        if (cidadeSelecionada && cidades.includes(cidadeSelecionada)) {
+          this.anuncioForm.controls.cidade.setValue(cidadeSelecionada);
+        }
+      },
+      error: () => {
+        this.carregandoCidades = false;
+        this.cidadesErro = 'Não foi possível carregar as cidades. Tente novamente.';
+      }
+    });
+  }
+
+  private preencherLocalizacao(localizacao: string): void {
+    const parsed = parseLocalizacao(localizacao);
+    if (!parsed) {
+      this.anuncioForm.patchValue({ uf: '', cidade: '' });
+      this.cidades = [];
+      this.feedback = 'Editando anúncio. Selecione novamente o estado e a cidade.';
+      return;
+    }
+    this.anuncioForm.patchValue({ uf: parsed.uf, cidade: '' });
+    this.carregarCidades(parsed.uf, parsed.cidade);
   }
 
   excluirAnuncio(anuncio: Anuncio): void {
@@ -297,7 +345,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
       this.revokePreviews();
       this.selectedGalleryFiles = optimized;
-      this.previewImages = optimized.map((item) => URL.createObjectURL(item));
+      this.previewImages = await Promise.all(optimized.map((item) => readAsDataUrl(item)));
     } finally {
       this.processingImages = false;
     }
@@ -347,11 +395,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.originalImages = [];
     this.selectedGalleryFiles = [];
     this.currentImageUrl = null;
+    this.cidades = [];
+    this.cidadesErro = '';
     this.anuncioFormDirective?.resetForm({
       titulo: '',
       descricao: '',
       categoria: '',
-      localizacao: '',
+      uf: '',
+      cidade: '',
       preco: null,
       tipoCobranca: 'UNICO'
     });
