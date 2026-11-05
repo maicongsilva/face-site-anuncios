@@ -80,7 +80,9 @@
   <div class="card-grid" *ngIf="!loading && cards.length">
     <mat-card class="showcase-card" *ngFor="let card of cards">
       <div class="image-wrap">
-        <img mat-card-image [src]="card.image" [alt]="card.titulo" loading="lazy" decoding="async">
+        <a [routerLink]="['/anuncios', card.id]" class="image-link" [attr.aria-label]="'Ver detalhes de ' + card.titulo">
+          <img mat-card-image [src]="card.image" [alt]="card.titulo" loading="lazy" decoding="async">
+        </a>
         <span class="tag">{{ card.categoria }}</span>
         <span class="new-badge" *ngIf="card.isNovo">Novo</span>
         <button mat-icon-button class="fav-btn card-fav" [class.fav-active]="card.favoritado" type="button" (click)="toggleFavorito(card)" [attr.aria-label]="card.favoritado ? 'Desfavoritar' : 'Favoritar'">
