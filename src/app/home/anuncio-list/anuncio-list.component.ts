@@ -5,6 +5,7 @@ import { Anuncio } from 'src/app/shared/model/anuncio.model';
 import { AnuncioService } from 'src/app/shared/model/service/anuncio.service';
 import { AuthService } from 'src/app/shared/model/service/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { toThumbnailUrl } from 'src/app/shared/utils/thumbnail.utils';
 
 @Component({
   selector: 'app-anuncio-list',
@@ -148,7 +149,7 @@ export class AnuncioListComponent implements OnInit, OnDestroy {
         this.cards = this.cards.map((item) => item.id === updated.id
           ? {
               ...updated,
-              image: updated.imagemUrl || this.getImageByCategory(updated.categoria),
+              image: toThumbnailUrl(updated.imagemUrl) || this.getImageByCategory(updated.categoria),
               isNovo: item.isNovo
             }
           : item);
@@ -178,7 +179,7 @@ export class AnuncioListComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.cards = response.content.map((anuncio) => ({
           ...anuncio,
-          image: anuncio.imagemUrl || this.getImageByCategory(anuncio.categoria),
+          image: toThumbnailUrl(anuncio.imagemUrl) || this.getImageByCategory(anuncio.categoria),
           isNovo: this.isAnuncioNovo(anuncio.dataCriacao)
         }));
         this.totalPaginas = response.totalPages;

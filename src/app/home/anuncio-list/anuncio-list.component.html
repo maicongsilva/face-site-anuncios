@@ -80,7 +80,7 @@
   <div class="card-grid" *ngIf="!loading && cards.length">
     <mat-card class="showcase-card" *ngFor="let card of cards">
       <div class="image-wrap">
-        <img mat-card-image [src]="card.image" [alt]="card.titulo">
+        <img mat-card-image [src]="card.image" [alt]="card.titulo" loading="lazy" decoding="async">
         <span class="tag">{{ card.categoria }}</span>
         <span class="new-badge" *ngIf="card.isNovo">Novo</span>
       </div>

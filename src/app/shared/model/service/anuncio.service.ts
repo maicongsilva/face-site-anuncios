@@ -1,6 +1,6 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpEventType, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { filter, map, Observable, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Anuncio, AnuncioPage } from '../anuncio.model';
 
@@ -87,15 +87,6 @@ export class AnuncioService {
     );
   }
 
-  uploadImagem(id: number, file: File): Observable<Anuncio> {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    return this.http.post<Anuncio>(`${this.apiUrl}/${id}/imagem`, formData).pipe(
-      map((anuncio) => this.normalizeAnuncio(anuncio))
-    );
-  }
-
   uploadImagens(id: number, files: File[]): Observable<Anuncio> {
     const formData = new FormData();
     files.forEach((file) => formData.append('files', file));
@@ -103,6 +94,35 @@ export class AnuncioService {
     return this.http.post<Anuncio>(`${this.apiUrl}/${id}/imagens`, formData).pipe(
       map((anuncio) => this.normalizeAnuncio(anuncio))
     );
+  }
+
+  uploadImagensComProgresso(id: number, files: File[], onProgress: (percent: number) => void): Observable<Anuncio> {
+    const formData = new FormData();
+    files.forEach((file) => formData.append('files', file));
+
+    return this.http.post<Anuncio>(`${this.apiUrl}/${id}/imagens`, formData, {
+      observe: 'events',
+      reportProgress: true
+    }).pipe(
+      tap((event) => {
+        if (event.type === HttpEventType.UploadProgress && event.total) {
+          onProgress(Math.round((event.loaded / event.total) * 100));
+        }
+      }),
+      filter((event) => event.type === HttpEventType.Response),
+      map((event) => this.normalizeAnuncio((event as { body: Anuncio }).body))
+    );
+  }
+
+  reorganizarImagens(id: number, imagens: string[]): Observable<Anuncio> {
+    return this.http.put<Anuncio>(`${this.apiUrl}/${id}/imagens`, { imagens }).pipe(
+      map((anuncio) => this.normalizeAnuncio(anuncio))
+    );
+  }
+
+  toStoredImageUrl(url: string): string {
+    const prefix = `${this.getBackendOrigin()}/uploads`;
+    return url.startsWith(prefix) ? url.substring(this.getBackendOrigin().length) : url;
   }
 
   toggleFavorito(id: number): Observable<Anuncio> {

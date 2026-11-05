@@ -108,20 +108,37 @@
               <div class="full-width upload-box">
                 <label for="anuncio-image"><strong>Fotos do anúncio</strong></label>
                 <input id="anuncio-image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple (change)="onImageSelected($event)">
-                <small>Formatos aceitos: JPG, PNG, WEBP e GIF. Selecione até 6 imagens para criar uma galeria mais atrativa.</small>
+                <small>Formatos aceitos: JPG, PNG, WEBP e GIF. Até 6 imagens; elas são otimizadas automaticamente antes do envio.</small>
+                <small *ngIf="processingImages">Otimizando imagens...</small>
+
+                <div class="preview-gallery" *ngIf="existingImages.length">
+                  <div class="preview-item" *ngFor="let image of existingImages; let i = index; let first = first; let last = last">
+                    <img [src]="thumb(image)" alt="Foto atual" class="preview-thumb" [class.primary-thumb]="first">
+                    <div class="preview-actions">
+                      <button type="button" (click)="moverImagem(i, -1)" [disabled]="first" aria-label="Mover para a esquerda">◀</button>
+                      <button type="button" (click)="moverImagem(i, 1)" [disabled]="last" aria-label="Mover para a direita">▶</button>
+                      <button type="button" (click)="removerImagemExistente(i)" aria-label="Remover foto">✕</button>
+                    </div>
+                  </div>
+                </div>
+                <small *ngIf="existingImages.length">A primeira foto é a principal. Salve o anúncio para aplicar as alterações.</small>
 
                 <div class="preview-gallery" *ngIf="previewImages.length">
                   <img
-                    *ngFor="let image of previewImages; let first = first"
+                    *ngFor="let image of previewImages"
                     [src]="image"
-                    alt="Prévia da imagem"
-                    class="preview-thumb"
-                    [class.primary-thumb]="first">
+                    alt="Prévia da nova imagem"
+                    class="preview-thumb">
                 </div>
               </div>
 
+              <div class="upload-progress" *ngIf="uploadProgress !== null">
+                <progress max="100" [value]="uploadProgress"></progress>
+                <small>Enviando fotos... {{ uploadProgress }}%</small>
+              </div>
+
               <div class="form-actions">
-                <button mat-raised-button color="primary" type="submit" [disabled]="submitting">
+                <button mat-raised-button color="primary" type="submit" [disabled]="submitting || processingImages">
                   {{ submitting ? 'Salvando...' : (editingId ? 'Salvar alterações' : 'Publicar anúncio') }}
                 </button>
                 <button *ngIf="editingId" mat-stroked-button type="button" (click)="cancelarEdicao()">
@@ -175,7 +192,7 @@
 
             <div class="my-ad-list" *ngIf="meusFavoritos.length; else emptyFavorites">
               <div class="ad-item" *ngFor="let anuncio of meusFavoritos">
-                <img *ngIf="anuncio.imagemUrl" [src]="anuncio.imagemUrl" [alt]="anuncio.titulo" class="ad-thumb">
+                <img *ngIf="anuncio.imagemUrl" [src]="thumb(anuncio.imagemUrl)" [alt]="anuncio.titulo" class="ad-thumb" loading="lazy" decoding="async">
 
                 <div class="ad-content">
                   <strong>{{ anuncio.titulo }}</strong>
@@ -211,7 +228,7 @@
 
             <div class="my-ad-list" *ngIf="meusAnuncios.length; else emptyState">
               <div class="ad-item" *ngFor="let anuncio of meusAnuncios">
-                <img *ngIf="anuncio.imagemUrl" [src]="anuncio.imagemUrl" [alt]="anuncio.titulo" class="ad-thumb">
+                <img *ngIf="anuncio.imagemUrl" [src]="thumb(anuncio.imagemUrl)" [alt]="anuncio.titulo" class="ad-thumb" loading="lazy" decoding="async">
 
                 <div class="ad-content">
                   <strong>{{ anuncio.titulo }}</strong>

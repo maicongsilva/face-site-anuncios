@@ -127,6 +127,43 @@
   border-color: #2563eb;
 }
 
+.preview-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.preview-actions {
+  display: flex;
+  gap: 4px;
+
+  button {
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    border-radius: 6px;
+    padding: 0 6px;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
+}
+
+.upload-progress {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  progress {
+    width: 100%;
+    height: 10px;
+  }
+}
+
 .form-actions {
   grid-column: 1 / -1;
   display: flex;

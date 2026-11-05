@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { toThumbnailUrl } from '../shared/utils/thumbnail.utils';
 import { Anuncio } from '../shared/model/anuncio.model';
 import { AnuncioService } from '../shared/model/service/anuncio.service';
 import { AuthService } from '../shared/model/service/auth.service';
@@ -11,6 +12,7 @@ import { AuthService } from '../shared/model/service/auth.service';
   styleUrls: ['./anuncio-detail.component.scss']
 })
 export class AnuncioDetailComponent implements OnInit {
+  readonly thumb = (url?: string | null, width = 200) => toThumbnailUrl(url, width);
   anuncio: Anuncio | null = null;
   relacionados: Anuncio[] = [];
   loading = true;

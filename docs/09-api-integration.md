@@ -114,6 +114,8 @@ Authorization: Bearer <token>   ← Adicionado automaticamente pelo AuthIntercep
 
 ### Upload de Imagem
 
+O backend aceita arquivos de até 10 MB e requisições multipart de até 10 MB. O Nginx do frontend deve permitir o mesmo tamanho (`client_max_body_size 10m`). Em produção, configure também esse limite no Nginx externo da VM, que recebe a requisição antes dos containers, e recarregue o serviço após validar a configuração com `nginx -t`.
+
 ```typescript
 // Construção do FormData
 const formData = new FormData();

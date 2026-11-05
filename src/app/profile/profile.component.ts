@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroupDirective, Validators } from '@angular/forms';
-import { Observable, of, Subscription, switchMap } from 'rxjs';
+import { catchError, Observable, of, Subscription, switchMap } from 'rxjs';
+import { compressImage, MAX_IMAGES_PER_ANUNCIO, MAX_UPLOAD_TOTAL_BYTES } from '../shared/utils/image-compress.utils';
 import { AuthService } from '../shared/model/service/auth.service';
 import { AuthUser } from '../shared/model/auth.model';
 import { Anuncio, TipoCobranca } from '../shared/model/anuncio.model';
@@ -8,13 +9,14 @@ import { ChatThread } from '../shared/model/chat-thread.model';
 import { AnuncioService } from '../shared/model/service/anuncio.service';
 import { ChatService } from '../shared/model/service/chat.service';
 import { getErrorMessage } from '../shared/utils/error.utils';
+import { toThumbnailUrl } from '../shared/utils/thumbnail.utils';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, OnDestroy {
   private readonly allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
   readonly categoriasAnuncio = ['Tecnologia', 'Móveis', 'Esporte', 'Imóveis', 'Aulas', 'Serviços', 'Produtos', 'Veículos', 'Outros'];
   categoriaAtualLegada: string | null = null;
@@ -28,10 +30,15 @@ export class ProfileComponent implements OnInit {
   feedback = '';
   profileFeedback = '';
   editingId: number | null = null;
-  previewImage: string | null = null;
   previewImages: string[] = [];
-  selectedImageFile: File | null = null;
   selectedGalleryFiles: File[] = [];
+  processingImages = false;
+  readonly thumb = (url?: string | null, width = 200) => toThumbnailUrl(url, width);
+  uploadProgress: number | null = null;
+  existingImages: string[] = [];
+  private originalImages: string[] = [];
+  private uploadFailed = false;
+  private reorderFailed = false;
   currentImageUrl: string | null = null;
   @ViewChild('anuncioFormDirective') private anuncioFormDirective?: FormGroupDirective;
 
@@ -73,6 +80,11 @@ export class ProfileComponent implements OnInit {
     });
 
     this.unreadSubscription = this.chatService.unreadRefresh$.subscribe(() => this.carregarConversas());
+  }
+
+  ngOnDestroy(): void {
+    this.unreadSubscription?.unsubscribe();
+    this.revokePreviews();
   }
 
   salvarPerfil(): void {
@@ -127,31 +139,67 @@ export class ProfileComponent implements OnInit {
 
     request$.pipe(
       switchMap((anuncio) => {
-        if (this.selectedGalleryFiles.length > 1 && anuncio.id) {
-          return this.anuncioService.uploadImagens(anuncio.id, this.selectedGalleryFiles);
+        const galleryChanged = !!anuncio.id && !!this.editingId
+          && this.existingImages.join('|') !== this.originalImages.join('|');
+        if (!galleryChanged) {
+          return of(anuncio);
         }
 
-        if (this.selectedImageFile && anuncio.id) {
-          return this.anuncioService.uploadImagem(anuncio.id, this.selectedImageFile);
+        return this.anuncioService.reorganizarImagens(
+          anuncio.id as number,
+          this.existingImages.map((url) => this.anuncioService.toStoredImageUrl(url))
+        ).pipe(
+          catchError(() => {
+            this.uploadFailed = true;
+            this.reorderFailed = true;
+            return of(anuncio);
+          })
+        );
+      }),
+      switchMap((anuncio) => {
+        if (this.uploadFailed || !this.selectedGalleryFiles.length || !anuncio.id) {
+          return of(anuncio);
         }
 
-        return of(anuncio);
+        this.uploadProgress = 0;
+        return this.anuncioService.uploadImagensComProgresso(
+          anuncio.id,
+          this.selectedGalleryFiles,
+          (percent) => this.uploadProgress = percent
+        ).pipe(
+          catchError(() => {
+            this.uploadFailed = true;
+            return of(anuncio);
+          })
+        );
       })
     ).subscribe({
       next: (anuncio) => {
-        if (this.editingId) {
-          this.meusAnuncios = this.meusAnuncios.map(item => item.id === anuncio.id ? anuncio : item);
-          this.feedback = 'Anúncio atualizado com sucesso.';
-        } else {
-          this.meusAnuncios = [anuncio, ...this.meusAnuncios];
-          this.feedback = 'Anúncio publicado com sucesso.';
+        const exists = this.meusAnuncios.some(item => item.id === anuncio.id);
+        this.meusAnuncios = exists
+          ? this.meusAnuncios.map(item => item.id === anuncio.id ? anuncio : item)
+          : [anuncio, ...this.meusAnuncios];
+        this.submitting = false;
+        this.uploadProgress = null;
+
+        if (this.uploadFailed) {
+          // Mantém o anúncio em edição para o reenvio das fotos não duplicá-lo.
+          this.uploadFailed = false;
+          const reorderFailed = this.reorderFailed;
+          this.reorderFailed = false;
+          this.editarAnuncio(anuncio);
+          this.feedback = reorderFailed
+            ? 'O anúncio foi salvo, mas não foi possível aplicar a remoção ou a ordem das fotos. Ajuste-as novamente e salve.'
+            : 'O anúncio foi salvo, mas não foi possível enviar as fotos. Selecione-as novamente e salve para tentar de novo.';
+          return;
         }
 
-        this.submitting = false;
+        this.feedback = this.editingId ? 'Anúncio atualizado com sucesso.' : 'Anúncio publicado com sucesso.';
         this.resetFormulario();
       },
       error: (error) => {
         this.submitting = false;
+        this.uploadProgress = null;
         this.feedback = getErrorMessage(error);
       }
     });
@@ -161,9 +209,10 @@ export class ProfileComponent implements OnInit {
     this.editingId = anuncio.id || null;
     this.categoriaAtualLegada = this.categoriasAnuncio.includes(anuncio.categoria) ? null : anuncio.categoria;
     this.currentImageUrl = anuncio.imagemUrl || null;
-    this.previewImage = anuncio.imagemUrl || null;
-    this.previewImages = anuncio.imagens?.length ? anuncio.imagens : (anuncio.imagemUrl ? [anuncio.imagemUrl] : []);
-    this.selectedImageFile = null;
+    this.revokePreviews();
+    this.previewImages = [];
+    this.existingImages = anuncio.imagens?.length ? [...anuncio.imagens] : (anuncio.imagemUrl ? [anuncio.imagemUrl] : []);
+    this.originalImages = [...this.existingImages];
     this.selectedGalleryFiles = [];
     this.anuncioForm.patchValue({
       titulo: anuncio.titulo,
@@ -212,35 +261,46 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  onImageSelected(event: Event): void {
+  async onImageSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
-    const file = input.files && input.files.length ? input.files[0] : null;
-
-    if (!file) {
-      return;
-    }
-
     const files = Array.from(input.files || []);
     if (!files.length) {
       return;
     }
 
-    const invalidFile = files.find((item) => !this.allowedImageTypes.includes(item.type));
-    if (invalidFile) {
-      this.feedback = 'Formato de imagem nao suportado. Use JPG, PNG, WEBP ou GIF.';
+    const remaining = MAX_IMAGES_PER_ANUNCIO - this.existingImages.length;
+    if (files.length > remaining) {
+      this.feedback = this.existingImages.length
+        ? `Este anúncio já tem ${this.existingImages.length} foto(s). Você pode adicionar no máximo ${Math.max(remaining, 0)}.`
+        : `Selecione no máximo ${MAX_IMAGES_PER_ANUNCIO} imagens.`;
       input.value = '';
-      this.selectedImageFile = null;
-      this.selectedGalleryFiles = [];
-      this.previewImage = null;
-      this.previewImages = [];
       return;
     }
 
-    this.selectedGalleryFiles = files;
-    this.selectedImageFile = files[0] || null;
-    this.previewImage = null;
-    this.previewImages = files.map((item) => URL.createObjectURL(item));
-    this.previewImage = this.previewImages[0] || null;
+    if (files.some((item) => !this.allowedImageTypes.includes(item.type))) {
+      this.feedback = 'Formato de imagem nao suportado. Use JPG, PNG, WEBP ou GIF.';
+      input.value = '';
+      return;
+    }
+
+    this.feedback = '';
+    this.processingImages = true;
+    try {
+      const optimized = await Promise.all(files.map((item) => compressImage(item)));
+      const totalBytes = optimized.reduce((sum, item) => sum + item.size, 0);
+
+      if (totalBytes > MAX_UPLOAD_TOTAL_BYTES) {
+        this.feedback = 'As imagens ainda ultrapassam 9 MB no total. Escolha menos imagens ou arquivos menores.';
+        input.value = '';
+        return;
+      }
+
+      this.revokePreviews();
+      this.selectedGalleryFiles = optimized;
+      this.previewImages = optimized.map((item) => URL.createObjectURL(item));
+    } finally {
+      this.processingImages = false;
+    }
   }
 
   cancelarEdicao(): void {
@@ -281,9 +341,10 @@ export class ProfileComponent implements OnInit {
   private resetFormulario(): void {
     this.editingId = null;
     this.categoriaAtualLegada = null;
-    this.previewImage = null;
+    this.revokePreviews();
     this.previewImages = [];
-    this.selectedImageFile = null;
+    this.existingImages = [];
+    this.originalImages = [];
     this.selectedGalleryFiles = [];
     this.currentImageUrl = null;
     this.anuncioFormDirective?.resetForm({
@@ -296,12 +357,30 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  private toRelativeImageUrl(url: string | null): string | undefined {
-    if (!url) {
-      return undefined;
-    }
+  private revokePreviews(): void {
+    this.previewImages
+      .filter((url) => url.startsWith('blob:'))
+      .forEach((url) => URL.revokeObjectURL(url));
+  }
 
-    return url.replace(/^https?:\/\/[^/]+/, '');
+  private toRelativeImageUrl(url: string | null): string | undefined {
+    return url ? this.anuncioService.toStoredImageUrl(url) : undefined;
+  }
+
+  moverImagem(index: number, delta: number): void {
+    const target = index + delta;
+    if (target < 0 || target >= this.existingImages.length) {
+      return;
+    }
+    const lista = [...this.existingImages];
+    [lista[index], lista[target]] = [lista[target], lista[index]];
+    this.existingImages = lista;
+    this.currentImageUrl = lista[0];
+  }
+
+  removerImagemExistente(index: number): void {
+    this.existingImages = this.existingImages.filter((_, i) => i !== index);
+    this.currentImageUrl = this.existingImages[0] || null;
   }
 
   private carregarMeusAnuncios(): void {

@@ -50,6 +50,9 @@ export function getErrorMessage(error: unknown, context: ErrorContext = 'generic
     case 404:
       return 'Recurso não encontrado.';
 
+    case 413:
+      return 'O envio excede o limite de 10 MB. Reduza o tamanho ou a quantidade de imagens e tente novamente.';
+
     case 409:
       return isBackendMessageClean ? backendMessage! : 'Este dado já está cadastrado.';
 

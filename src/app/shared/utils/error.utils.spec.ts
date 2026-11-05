@@ -20,6 +20,17 @@ describe('getErrorMessage', () => {
     expect(getErrorMessage(error, 'login')).toBe('Credenciais inválidas.');
   });
 
+  it('should show a friendly message when an image upload exceeds the request limit', () => {
+    const error = new HttpErrorResponse({
+      status: 413,
+      error: '<html><title>413 Request Entity Too Large</title></html>'
+    });
+
+    expect(getErrorMessage(error)).toBe(
+      'O envio excede o limite de 10 MB. Reduza o tamanho ou a quantidade de imagens e tente novamente.'
+    );
+  });
+
   it('should show a friendly login message for server errors', () => {
     const error = new HttpErrorResponse({
       status: 500,

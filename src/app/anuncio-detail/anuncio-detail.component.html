@@ -22,7 +22,7 @@
           *ngFor="let image of item.imagens"
           [class.active-thumb]="selectedImageUrl === image"
           (click)="selecionarImagem(image)">
-          <img [src]="image" [alt]="item.titulo" class="thumb-image">
+          <img [src]="thumb(image)" [alt]="item.titulo" class="thumb-image" loading="lazy" decoding="async">
         </button>
       </div>
 
@@ -117,7 +117,7 @@
 
       <div class="related-grid">
         <mat-card class="related-card" *ngFor="let related of relacionados">
-          <img *ngIf="related.imagemUrl" [src]="related.imagemUrl" [alt]="related.titulo" class="related-image">
+          <img *ngIf="related.imagemUrl" [src]="thumb(related.imagemUrl, 480)" [alt]="related.titulo" class="related-image" loading="lazy" decoding="async">
           <mat-card-content>
             <strong>{{ related.titulo }}</strong>
             <span>{{ related.preco | precoAnuncio:related.tipoCobranca }}</span>
