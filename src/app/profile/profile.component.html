@@ -93,7 +93,7 @@
               <mat-form-field appearance="outline">
                 <mat-label>Cidade</mat-label>
                 <select matNativeControl formControlName="cidade">
-                  <option value="" disabled>{{ carregandoCidades ? 'Carregando cidades...' : 'Selecione a cidade' }}</option>
+                  <option value="" disabled>{{ !anuncioForm.controls.uf.value ? 'Selecione o estado primeiro' : (carregandoCidades ? 'Carregando cidades...' : 'Selecione a cidade') }}</option>
                   <option *ngFor="let cidade of cidades" [value]="cidade">{{ cidade }}</option>
                 </select>
                 <mat-hint *ngIf="cidadesErro">{{ cidadesErro }}</mat-hint>
