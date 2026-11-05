@@ -91,7 +91,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.unreadSubscription?.unsubscribe();
-    this.revokePreviews();
   }
 
   salvarPerfil(): void {
@@ -216,7 +215,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.editingId = anuncio.id || null;
     this.categoriaAtualLegada = this.categoriasAnuncio.includes(anuncio.categoria) ? null : anuncio.categoria;
     this.currentImageUrl = anuncio.imagemUrl || null;
-    this.revokePreviews();
     this.previewImages = [];
     this.existingImages = anuncio.imagens?.length ? [...anuncio.imagens] : (anuncio.imagemUrl ? [anuncio.imagemUrl] : []);
     this.originalImages = [...this.existingImages];
@@ -343,7 +341,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
         return;
       }
 
-      this.revokePreviews();
       this.selectedGalleryFiles = optimized;
       this.previewImages = await Promise.all(optimized.map((item) => readAsDataUrl(item)));
     } finally {
@@ -389,7 +386,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private resetFormulario(): void {
     this.editingId = null;
     this.categoriaAtualLegada = null;
-    this.revokePreviews();
     this.previewImages = [];
     this.existingImages = [];
     this.originalImages = [];
@@ -406,12 +402,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
       preco: null,
       tipoCobranca: 'UNICO'
     });
-  }
-
-  private revokePreviews(): void {
-    this.previewImages
-      .filter((url) => url.startsWith('blob:'))
-      .forEach((url) => URL.revokeObjectURL(url));
   }
 
   private toRelativeImageUrl(url: string | null): string | undefined {

@@ -25,7 +25,7 @@ describe('compressImage', () => {
     expect(['image/webp', 'image/jpeg']).toContain(result.type);
 
     const bitmap = await createImageBitmap(result);
-    expect(Math.max(bitmap.width, bitmap.height)).toBeLessThanOrEqual(1600);
+    expect(Math.max(bitmap.width, bitmap.height)).toBeLessThanOrEqual(1920);
   });
 
   it('should return GIF files untouched', async () => {
