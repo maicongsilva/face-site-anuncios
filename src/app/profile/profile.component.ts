@@ -359,10 +359,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
     const remaining = MAX_IMAGES_PER_ANUNCIO - this.existingImages.length - this.selectedGalleryFiles.length;
     if (files.length > remaining) {
-      const atuais = this.existingImages.length + this.selectedGalleryFiles.length;
-      this.feedback = atuais
-        ? `O anúncio já tem ${atuais} foto(s). Você pode adicionar no máximo ${Math.max(remaining, 0)}. Remova uma foto para trocar.`
-        : `Selecione no máximo ${MAX_IMAGES_PER_ANUNCIO} imagens.`;
+      this.feedback = `Limite de ${MAX_IMAGES_PER_ANUNCIO} fotos por anúncio.`;
       input.value = '';
       return;
     }

@@ -137,7 +137,6 @@
                     </div>
                   </div>
                 </div>
-                <small *ngIf="existingImages.length">A primeira foto é a principal. Salve o anúncio para aplicar as alterações.</small>
 
                 <div class="preview-gallery" *ngIf="previewImages.length">
                   <div class="preview-item" *ngFor="let image of previewImages; let i = index; let first = first; let last = last">
@@ -149,7 +148,6 @@
                     </div>
                   </div>
                 </div>
-                <small *ngIf="previewImages.length">Novas fotos: use ✕ para remover e escolha outra. Elas são enviadas ao publicar.</small>
               </div>
 
               <div class="upload-progress" *ngIf="uploadProgress !== null">
