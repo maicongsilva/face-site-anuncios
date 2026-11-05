@@ -26,6 +26,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   meusFavoritos: Anuncio[] = [];
   minhasConversas: ChatThread[] = [];
   private unreadSubscription?: Subscription;
+  private cidadesSubscription?: Subscription;
   submitting = false;
   updatingProfile = false;
   feedback = '';
@@ -92,6 +93,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.unreadSubscription?.unsubscribe();
+    this.cidadesSubscription?.unsubscribe();
   }
 
   salvarPerfil(): void {
@@ -194,10 +196,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.uploadFailed = false;
           const reorderFailed = this.reorderFailed;
           this.reorderFailed = false;
+          const pendingFiles = this.selectedGalleryFiles;
+          const pendingPreviews = this.previewImages;
           this.editarAnuncio(anuncio);
+          this.selectedGalleryFiles = pendingFiles;
+          this.previewImages = pendingPreviews;
           this.feedback = reorderFailed
-            ? 'O anúncio foi salvo, mas não foi possível aplicar a remoção ou a ordem das fotos. Ajuste-as novamente e salve.'
-            : 'O anúncio foi salvo, mas não foi possível enviar as fotos. Selecione-as novamente e salve para tentar de novo.';
+            ? 'O anúncio foi salvo, mas não foi possível aplicar a remoção ou a ordem das fotos. Ajuste-as novamente e salve; as fotos novas foram mantidas.'
+            : 'O anúncio foi salvo, mas não foi possível enviar as fotos. Elas foram mantidas: salve novamente para tentar de novo.';
           return;
         }
 
@@ -257,10 +263,15 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   private readonly cidadeNaListaValidator = (control: AbstractControl): ValidationErrors | null => {
     const valor = control.value as string;
-    return !valor || this.nomeCanonicoCidade(valor) ? null : { cidadeInvalida: true };
+    // Sem a lista do IBGE aceita texto livre; o backend valida o formato "Cidade, UF".
+    if (!valor || this.cidadesErro || this.nomeCanonicoCidade(valor)) {
+      return null;
+    }
+    return { cidadeInvalida: true };
   };
 
   private carregarCidades(uf: string, cidadeSelecionada = ''): void {
+    this.cidadesSubscription?.unsubscribe();
     this.cidades = [];
     this.cidadesFiltradas = [];
     this.cidadesErro = '';
@@ -268,7 +279,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       return;
     }
     this.carregandoCidades = true;
-    this.localidadeService.listarMunicipios(uf).subscribe({
+    this.cidadesSubscription = this.localidadeService.listarMunicipios(uf).subscribe({
       next: (cidades) => {
         this.cidades = cidades;
         this.carregandoCidades = false;
@@ -281,7 +292,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.carregandoCidades = false;
-        this.cidadesErro = 'Não foi possível carregar as cidades. Tente novamente.';
+        this.cidadesErro = 'Não foi possível carregar a lista de cidades. Digite o nome da cidade manualmente.';
+        if (cidadeSelecionada) {
+          this.anuncioForm.controls.cidade.setValue(cidadeSelecionada);
+        }
+        this.anuncioForm.controls.cidade.updateValueAndValidity();
       }
     });
   }
@@ -442,6 +457,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.currentImageUrl = null;
     this.cidades = [];
     this.cidadesFiltradas = [];
+    this.cidadesSubscription?.unsubscribe();
+    this.carregandoCidades = false;
     this.cidadesErro = '';
     this.anuncioFormDirective?.resetForm({
       titulo: '',
