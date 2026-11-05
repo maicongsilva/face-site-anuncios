@@ -83,6 +83,9 @@
         <img mat-card-image [src]="card.image" [alt]="card.titulo" loading="lazy" decoding="async">
         <span class="tag">{{ card.categoria }}</span>
         <span class="new-badge" *ngIf="card.isNovo">Novo</span>
+        <button mat-icon-button class="fav-btn card-fav" [class.fav-active]="card.favoritado" type="button" (click)="toggleFavorito(card)" [attr.aria-label]="card.favoritado ? 'Desfavoritar' : 'Favoritar'">
+          <mat-icon>{{ card.favoritado ? 'favorite' : 'favorite_border' }}</mat-icon>
+        </button>
       </div>
       <mat-card-content class="card-body">
         <h3>{{ card.titulo }}</h3>
@@ -95,17 +98,11 @@
 
         <div class="seller-line">
           <small>{{ card.anuncianteNome }}</small>
-          <small class="favorite-count">
-            <mat-icon class="heart-icon" [class.hearted]="card.favoritado">{{ card.favoritado ? 'favorite' : 'favorite_border' }}</mat-icon>
-            {{ card.totalFavoritos || 0 }}
-          </small>
+          <small class="favorite-count">{{ card.totalFavoritos || 0 }} favorito(s)</small>
         </div>
       </mat-card-content>
       <mat-card-actions class="card-actions">
         <a mat-flat-button color="primary" [routerLink]="['/anuncios', card.id]">Detalhes</a>
-        <button mat-icon-button class="fav-btn" [class.fav-active]="card.favoritado" type="button" (click)="toggleFavorito(card)" [attr.aria-label]="card.favoritado ? 'Desfavoritar' : 'Favoritar'">
-          <mat-icon>{{ card.favoritado ? 'favorite' : 'favorite_border' }}</mat-icon>
-        </button>
       </mat-card-actions>
     </mat-card>
   </div>
