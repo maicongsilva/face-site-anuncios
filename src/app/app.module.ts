@@ -20,6 +20,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { ProfileComponent } from './profile/profile.component';
 import { AnuncioDetailComponent } from './anuncio-detail/anuncio-detail.component';
 import { AuthInterceptor } from './shared/interceptors/auth.interceptor';
@@ -69,6 +70,7 @@ import { PrecoAnuncioPipe } from './shared/pipes/preco-anuncio.pipe';
     MatBadgeModule,
     MatSnackBarModule,
     MatTabsModule,
+    MatAutocompleteModule,
     PrecoAnuncioPipe
   ]
 })

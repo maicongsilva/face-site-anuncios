@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroupDirective, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroupDirective, ValidationErrors, Validators } from '@angular/forms';
 import { catchError, Observable, of, Subscription, switchMap } from 'rxjs';
 import { compressImage, MAX_IMAGES_PER_ANUNCIO, MAX_UPLOAD_TOTAL_BYTES, readAsDataUrl } from '../shared/utils/image-compress.utils';
 import { AuthService } from '../shared/model/service/auth.service';
@@ -43,6 +43,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   currentImageUrl: string | null = null;
   readonly estados = ESTADOS_BR;
   cidades: string[] = [];
+  cidadesFiltradas: string[] = [];
   carregandoCidades = false;
   cidadesErro = '';
   @ViewChild('anuncioFormDirective') private anuncioFormDirective?: FormGroupDirective;
@@ -58,7 +59,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     descricao: this.fb.control('', { nonNullable: true, validators: [Validators.required, Validators.minLength(10)] }),
     categoria: this.fb.control('', { nonNullable: true, validators: [Validators.required] }),
     uf: this.fb.control('', { nonNullable: true, validators: [Validators.required] }),
-    cidade: this.fb.control('', { nonNullable: true, validators: [Validators.required] }),
+    cidade: this.fb.control('', { nonNullable: true, validators: [Validators.required, (control: AbstractControl) => this.cidadeNaListaValidator(control)] }),
     preco: this.fb.control<number | null>(null, [Validators.required, Validators.min(0)]),
     tipoCobranca: this.fb.control<TipoCobranca>('UNICO', { nonNullable: true })
   });
@@ -133,7 +134,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       titulo: formValue.titulo,
       descricao: formValue.descricao,
       categoria: formValue.categoria,
-      localizacao: formatLocalizacao(formValue.cidade, formValue.uf),
+      localizacao: formatLocalizacao(this.nomeCanonicoCidade(formValue.cidade) || formValue.cidade, formValue.uf),
       preco: Number(formValue.preco ?? 0),
       tipoCobranca: this.permiteTipoCobranca ? formValue.tipoCobranca : 'UNICO',
       imagemUrl: this.toRelativeImageUrl(this.currentImageUrl) || undefined
@@ -237,8 +238,31 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.carregarCidades(this.anuncioForm.controls.uf.value);
   }
 
+  filtrarCidades(): void {
+    const termo = this.normalizarTexto(this.anuncioForm.controls.cidade.value);
+    const resultado = termo
+      ? this.cidades.filter((cidade) => this.normalizarTexto(cidade).includes(termo))
+      : this.cidades;
+    this.cidadesFiltradas = resultado.slice(0, 100);
+  }
+
+  private normalizarTexto(texto: string): string {
+    return (texto || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+  }
+
+  private nomeCanonicoCidade(texto: string): string | undefined {
+    const chave = this.normalizarTexto(texto);
+    return chave ? this.cidades.find((cidade) => this.normalizarTexto(cidade) === chave) : undefined;
+  }
+
+  private readonly cidadeNaListaValidator = (control: AbstractControl): ValidationErrors | null => {
+    const valor = control.value as string;
+    return !valor || this.nomeCanonicoCidade(valor) ? null : { cidadeInvalida: true };
+  };
+
   private carregarCidades(uf: string, cidadeSelecionada = ''): void {
     this.cidades = [];
+    this.cidadesFiltradas = [];
     this.cidadesErro = '';
     if (!uf) {
       return;
@@ -248,9 +272,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
       next: (cidades) => {
         this.cidades = cidades;
         this.carregandoCidades = false;
-        if (cidadeSelecionada && cidades.includes(cidadeSelecionada)) {
-          this.anuncioForm.controls.cidade.setValue(cidadeSelecionada);
+        const canonica = cidadeSelecionada ? this.nomeCanonicoCidade(cidadeSelecionada) : undefined;
+        if (canonica) {
+          this.anuncioForm.controls.cidade.setValue(canonica);
         }
+        this.anuncioForm.controls.cidade.updateValueAndValidity();
+        this.filtrarCidades();
       },
       error: () => {
         this.carregandoCidades = false;
@@ -264,6 +291,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (!parsed) {
       this.anuncioForm.patchValue({ uf: '', cidade: '' });
       this.cidades = [];
+      this.cidadesFiltradas = [];
       this.feedback = 'Editando anúncio. Selecione novamente o estado e a cidade.';
       return;
     }
@@ -392,6 +420,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.selectedGalleryFiles = [];
     this.currentImageUrl = null;
     this.cidades = [];
+    this.cidadesFiltradas = [];
     this.cidadesErro = '';
     this.anuncioFormDirective?.resetForm({
       titulo: '',

@@ -92,11 +92,16 @@
 
               <mat-form-field appearance="outline">
                 <mat-label>Cidade</mat-label>
-                <select matNativeControl formControlName="cidade">
-                  <option value="" disabled>{{ !anuncioForm.controls.uf.value ? 'Selecione o estado primeiro' : (carregandoCidades ? 'Carregando cidades...' : 'Selecione a cidade') }}</option>
-                  <option *ngFor="let cidade of cidades" [value]="cidade">{{ cidade }}</option>
-                </select>
+                <input matInput formControlName="cidade" autocomplete="off"
+                       [matAutocomplete]="autoCidade"
+                       [readonly]="!anuncioForm.controls.uf.value"
+                       [placeholder]="!anuncioForm.controls.uf.value ? 'Selecione o estado primeiro' : (carregandoCidades ? 'Carregando cidades...' : 'Digite para buscar')"
+                       (input)="filtrarCidades()" (focus)="filtrarCidades()">
+                <mat-autocomplete #autoCidade="matAutocomplete">
+                  <mat-option *ngFor="let cidade of cidadesFiltradas" [value]="cidade">{{ cidade }}</mat-option>
+                </mat-autocomplete>
                 <mat-hint *ngIf="cidadesErro">{{ cidadesErro }}</mat-hint>
+                <mat-error *ngIf="anuncioForm.controls.cidade.hasError('cidadeInvalida')">Escolha uma cidade da lista.</mat-error>
               </mat-form-field>
 
               <mat-form-field appearance="outline">
