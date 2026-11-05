@@ -261,14 +261,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
     return chave ? this.cidades.find((cidade) => this.normalizarTexto(cidade) === chave) : undefined;
   }
 
-  private readonly cidadeNaListaValidator = (control: AbstractControl): ValidationErrors | null => {
+  private cidadeNaListaValidator(control: AbstractControl): ValidationErrors | null {
     const valor = control.value as string;
     // Sem a lista do IBGE aceita texto livre; o backend valida o formato "Cidade, UF".
     if (!valor || this.cidadesErro || this.nomeCanonicoCidade(valor)) {
       return null;
     }
     return { cidadeInvalida: true };
-  };
+  }
 
   private carregarCidades(uf: string, cidadeSelecionada = ''): void {
     this.cidadesSubscription?.unsubscribe();
