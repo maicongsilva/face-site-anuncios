@@ -342,10 +342,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const remaining = MAX_IMAGES_PER_ANUNCIO - this.existingImages.length;
+    const remaining = MAX_IMAGES_PER_ANUNCIO - this.existingImages.length - this.selectedGalleryFiles.length;
     if (files.length > remaining) {
-      this.feedback = this.existingImages.length
-        ? `Este anúncio já tem ${this.existingImages.length} foto(s). Você pode adicionar no máximo ${Math.max(remaining, 0)}.`
+      const atuais = this.existingImages.length + this.selectedGalleryFiles.length;
+      this.feedback = atuais
+        ? `O anúncio já tem ${atuais} foto(s). Você pode adicionar no máximo ${Math.max(remaining, 0)}. Remova uma foto para trocar.`
         : `Selecione no máximo ${MAX_IMAGES_PER_ANUNCIO} imagens.`;
       input.value = '';
       return;
@@ -361,19 +362,39 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.processingImages = true;
     try {
       const optimized = await Promise.all(files.map((item) => compressImage(item)));
-      const totalBytes = optimized.reduce((sum, item) => sum + item.size, 0);
+      const totalBytes = [...this.selectedGalleryFiles, ...optimized].reduce((sum, item) => sum + item.size, 0);
 
       if (totalBytes > MAX_UPLOAD_TOTAL_BYTES) {
         this.feedback = 'As imagens ainda ultrapassam 9 MB no total. Escolha menos imagens ou arquivos menores.';
-        input.value = '';
         return;
       }
 
-      this.selectedGalleryFiles = optimized;
-      this.previewImages = await Promise.all(optimized.map((item) => readAsDataUrl(item)));
+      const novasPrevias = await Promise.all(optimized.map((item) => readAsDataUrl(item)));
+      this.selectedGalleryFiles = [...this.selectedGalleryFiles, ...optimized];
+      this.previewImages = [...this.previewImages, ...novasPrevias];
     } finally {
       this.processingImages = false;
+      // Permite escolher o mesmo arquivo de novo depois de removê-lo.
+      input.value = '';
     }
+  }
+
+  removerImagemNova(index: number): void {
+    this.selectedGalleryFiles = this.selectedGalleryFiles.filter((_, i) => i !== index);
+    this.previewImages = this.previewImages.filter((_, i) => i !== index);
+  }
+
+  moverImagemNova(index: number, delta: number): void {
+    const target = index + delta;
+    if (target < 0 || target >= this.selectedGalleryFiles.length) {
+      return;
+    }
+    const arquivos = [...this.selectedGalleryFiles];
+    const previas = [...this.previewImages];
+    [arquivos[index], arquivos[target]] = [arquivos[target], arquivos[index]];
+    [previas[index], previas[target]] = [previas[target], previas[index]];
+    this.selectedGalleryFiles = arquivos;
+    this.previewImages = previas;
   }
 
   cancelarEdicao(): void {

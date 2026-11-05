@@ -125,7 +125,7 @@
               <div class="full-width upload-box">
                 <label for="anuncio-image"><strong>Fotos do anúncio</strong></label>
                 <input id="anuncio-image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple (change)="onImageSelected($event)">
-                <small>Formatos aceitos: JPG, PNG, WEBP e GIF. Até 6 imagens.</small>
+                <small>Formatos aceitos: JPG, PNG, WEBP e GIF. Até 6 imagens no total.</small>
 
                 <div class="preview-gallery" *ngIf="existingImages.length">
                   <div class="preview-item" *ngFor="let image of existingImages; let i = index; let first = first; let last = last">
@@ -140,12 +140,16 @@
                 <small *ngIf="existingImages.length">A primeira foto é a principal. Salve o anúncio para aplicar as alterações.</small>
 
                 <div class="preview-gallery" *ngIf="previewImages.length">
-                  <img
-                    *ngFor="let image of previewImages"
-                    [src]="image"
-                    alt="Prévia da nova imagem"
-                    class="preview-thumb">
+                  <div class="preview-item" *ngFor="let image of previewImages; let i = index; let first = first; let last = last">
+                    <img [src]="image" alt="Prévia da nova imagem" class="preview-thumb">
+                    <div class="preview-actions">
+                      <button type="button" (click)="moverImagemNova(i, -1)" [disabled]="first" aria-label="Mover para a esquerda">◀</button>
+                      <button type="button" (click)="moverImagemNova(i, 1)" [disabled]="last" aria-label="Mover para a direita">▶</button>
+                      <button type="button" (click)="removerImagemNova(i)" aria-label="Remover foto">✕</button>
+                    </div>
+                  </div>
                 </div>
+                <small *ngIf="previewImages.length">Novas fotos: use ✕ para remover e escolha outra. Elas são enviadas ao publicar.</small>
               </div>
 
               <div class="upload-progress" *ngIf="uploadProgress !== null">
